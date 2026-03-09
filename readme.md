@@ -13,7 +13,7 @@ MouseToxDB 是一个公开访问、只读型的科研数据库检索与展示网
 | UI 组件库 | Ant Design | 6.3 |
 | 路由 | React Router | v7 |
 | HTTP 客户端 | Axios | 1.13 |
-| PDF 预览 | react-pdf | 10.4 |
+| 国际化 | i18next + react-i18next | — |
 | 后端框架 | FastAPI | latest |
 | ORM | SQLAlchemy | >= 2.0 |
 | 数据校验 | Pydantic | >= 2.0 |
@@ -37,26 +37,33 @@ SDNU/
 │   │   │   ├── stats.ts               #   统计摘要 API
 │   │   │   └── download.ts            #   下载/导出（浏览器直接下载）
 │   │   ├── components/                # 可复用 UI 组件
-│   │   │   ├── Layout/index.tsx       #   全局布局（导航栏 + 页脚）
+│   │   │   ├── Layout/index.tsx       #   全局布局（双层导航栏 + 页脚）
 │   │   │   ├── SearchBox/index.tsx    #   搜索框（支持分类下拉 + 紧凑模式）
 │   │   │   ├── AnalysisTable/index.tsx#   分析条目分页表格
 │   │   │   ├── DegTable/index.tsx     #   DEG 差异基因分页表格
-│   │   │   ├── PdfCard/index.tsx      #   PDF 预览卡片（含状态处理）
+│   │   │   ├── PdfCard/index.tsx      #   PDF 预览卡片（PDF→PNG 渲染 + 下载）
 │   │   │   └── ExternalLink/index.tsx #   外部链接包装组件
+│   │   ├── i18n/                      # 国际化配置
+│   │   │   ├── index.ts              #   i18next 初始化（localStorage 持久化）
+│   │   │   ├── zh.json               #   中文翻译（130+ 条目）
+│   │   │   └── en.json               #   英文翻译
 │   │   ├── pages/                     # 页面组件（路由对应）
-│   │   │   ├── Home/index.tsx         #   首页：搜索框 + 统计卡片 + 流程图
+│   │   │   ├── Home/index.tsx         #   首页：Hero 横幅 + 搜索框 + 统计卡片 + 流程图 + 外部链接
 │   │   │   ├── Search/index.tsx       #   搜索结果页
 │   │   │   ├── Browse/index.tsx       #   浏览页：侧边栏筛选 + 表格
-│   │   │   ├── Analysis/index.tsx     #   详情页：5 个 Tab
+│   │   │   ├── Analysis/index.tsx     #   详情页：面包屑 + 侧边导航 + 8 个折叠面板
 │   │   │   ├── Download/index.tsx     #   下载页
 │   │   │   ├── Statistics/index.tsx   #   统计页
 │   │   │   └── Help/index.tsx         #   帮助页
+│   │   ├── assets/                    # 静态资源
+│   │   │   ├── banner.svg            #   首页 Hero 区背景图
+│   │   │   └── banner.jpg            #   首页 Hero 区备用背景
 │   │   ├── types/index.ts             # TypeScript 类型定义
 │   │   ├── utils/
 │   │   │   ├── formatters.ts          #   显示工具（空值显示 "—"）
 │   │   │   └── externalLinks.ts       #   外部链接 URL 构造器
-│   │   ├── App.tsx                    # 路由配置 + Ant Design 全局设置
-│   │   ├── main.tsx                   # 应用入口
+│   │   ├── App.tsx                    # 路由配置 + Ant Design 主题（学术风格 #2b579a）
+│   │   ├── main.tsx                   # 应用入口（加载 i18n）
 │   │   └── index.css                  # 全局样式
 │   ├── vite.config.ts                 # Vite 配置（代理 + 代码分割）
 │   ├── package.json                   # 依赖管理
@@ -97,6 +104,8 @@ SDNU/
 │   └── .env.example                   # 环境变量模板
 │
 ├── database/                          # 数据库初始化模块
+│   ├── data/
+│   │   └── 260307小鼠双端信息全.xlsx    # 源数据 Excel（986 条样本记录）
 │   ├── sql/
 │   │   ├── 001_create_tables.sql      # 建表 SQL（main_records + record_assets）
 │   │   └── 002_verify_data.sql        # 数据验证 SQL（12 项完整性检查）
@@ -124,8 +133,7 @@ SDNU/
 │   ├── DESEQ1001/
 │   └── ...
 │
-├── 260307小鼠双端信息全.xlsx            # 源数据 Excel（986 条样本记录）
-├── 数据库项目.md                       # 项目实施文档（完整设计规范）
+├── .gitignore                         # Git 忽略规则
 └── readme.md                          # 本文件
 ```
 
@@ -194,23 +202,47 @@ SDNU/
 
 ## 5. 前端页面
 
+### 5.1 页面路由
+
 | 路由 | 页面 | 功能 |
 |------|------|------|
-| `/` | 首页 | Hero 区 + 搜索框 + 统计卡片（986/81/36/78）+ 分析流程图 + 外部链接 |
+| `/` | 首页 | Hero 横幅 + 搜索框 + 统计卡片（986/81/36/78）+ 分析流程图 + 外部链接 |
 | `/search?keyword=&category=` | 搜索结果页 | 搜索框 + 结果表格（分页 30 条）+ 导出按钮 |
 | `/browse` | 浏览页 | 左侧筛选面板（组织分类/建库方法/发表年份）+ 右侧数据表格 |
-| `/analysis/:analysisKey` | 详情页 | 5 个 Tab：基本信息、实验信息、样本记录、图表资源、DEG 表格 |
+| `/analysis/:analysisKey` | 详情页 | 面包屑导航 + 侧边导航 + 8 个可折叠面板 |
 | `/download` | 下载页 | 整库 Excel 下载 |
-| `/statistics` | 统计页 | 静态统计图表（v1 使用图片） |
+| `/statistics` | 统计页 | 静态统计图表 |
 | `/help` | 帮助页 | 使用说明、字段说明、外链说明、联系方式 |
 
-详情页 5 个 Tab：
+### 5.2 详情页（Analysis）
 
-1. **基本信息**：化学物名称、CAS 号、InChIKey、PubChem CID（外链）、MESH 分类（7 级）
-2. **实验信息**：GSE_ID（外链 GEO）、BioProject（外链）、DOI（外链）、组织分类、建库方法等
-3. **样本记录**：SRR_ID（外链 SRA）、处理条件、实验分组、剂量、暴露时间
-4. **图表资源**：9 个 PDF 卡片（内嵌预览 + 下载）+ plot_df.txt 下载
-5. **DEG 表格**：解析 deg_table.txt，分页展示（每页 30 行）
+详情页采用折叠面板（Collapse）布局，左侧设有固定侧边导航栏，支持快速定位各区块。顶部显示面包屑导航（Home / Browse / DESEQ_ID）。
+
+8 个可折叠面板：
+
+1. **基本信息**：化学物名称、CAS 号、InChIKey、PubChem CID（外链）等
+2. **测序信息**：GSE_ID（外链 GEO）、SRR_ID（外链 SRA）、BioProject（外链）、Platform、AvgSpotLen 等
+3. **组织分类**：组织分类、组织细分、生殖细分、组织/细胞系、暴露毒物、剂量、暴露时间等
+4. **文献信息**：发表年月、参考文献、DOI（外链）
+5. **MESH 分类**：Class1–Class7（7 级分类）、推断分类
+6. **样本记录**：SRR_ID（外链 SRA）、处理条件、实验分组、剂量、暴露时间
+7. **图表资源**：9 个 PDF 预览卡片（PDF→PNG 渲染 + 下载）+ plot_df.txt 下载
+8. **DEG 表格**：解析 deg_table.txt，分页展示（每页 30 行）
+
+### 5.3 国际化（i18n）
+
+- 支持中文（zh）和英文（en）切换
+- 语言偏好存储在 `localStorage`，刷新后保持
+- 导航栏右上角提供语言切换按钮
+- Ant Design 组件库同步切换 locale（分页器、空状态等）
+
+### 5.4 UI 风格
+
+- 学术风格主题色：`#2b579a`（深蓝）
+- 双层导航栏：上层（Logo + 搜索框 + 语言切换），下层（标签页式菜单，选中项显示 `#e8a735` 金色顶部边框）
+- 全局字体大小 14px，字体 Arial
+- 表格：`#e6edf5` 表头背景，紧凑行高
+- 化学物名称列：固定宽度 + 省略号 + Tooltip 显示完整内容
 
 ---
 
@@ -253,7 +285,7 @@ pip install openpyxl pymysql python-dotenv
 
 # 导入 Excel 数据（986 条记录）
 cd database
-python scripts/import_excel.py --excel ../260307小鼠双端信息全.xlsx
+python scripts/import_excel.py --excel data/260307小鼠双端信息全.xlsx
 
 # 扫描资源文件（生成 355 条资源记录）
 python scripts/scan_assets.py --assets-dir ../demo
@@ -271,8 +303,8 @@ cd backend
 cp .env.example .env
 # 编辑 .env，确保以下配置：
 #   MYSQL_HOST=localhost
-#   ASSETS_DIR=/Users/.../SDNU/demo
-#   EXCEL_PATH=/Users/.../SDNU/260307小鼠双端信息全.xlsx
+#   ASSETS_DIR=/absolute/path/to/SDNU/demo
+#   EXCEL_PATH=/absolute/path/to/SDNU/database/data/260307小鼠双端信息全.xlsx
 
 # 安装依赖
 pip install -r requirements.txt
@@ -469,6 +501,8 @@ docker compose exec backend python scripts/scan_assets.py
    - 5 个数值字段转整数（sort_id, chemical_id, avg_spot_len, publication_year, publication_month）
 4. 生成 `analysis_key = {deseq_id}__{chemical_id}__{gse_id}__{bioproject_id}`
 5. 批量插入（每批 200 行）
+
+> **注意**：更新 Excel 后需手动重新运行 `import_excel.py` 导入数据，数据库不会自动同步。
 
 ### 8.2 资源扫描流程
 

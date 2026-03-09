@@ -276,7 +276,7 @@ def main():
 
     excel_path = args.excel or os.getenv(
         "EXCEL_PATH",
-        str(Path(__file__).resolve().parent.parent.parent / "260307小鼠双端信息全.xlsx")
+        str(Path(__file__).resolve().parent.parent.parent / "database" / "data" / "260307小鼠双端信息全.xlsx")
     )
 
     if not Path(excel_path).exists():

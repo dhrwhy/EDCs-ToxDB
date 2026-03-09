@@ -35,7 +35,7 @@ function App() {
           Layout: {
             headerBg: '#2b579a',
             headerColor: '#ffffff',
-            headerHeight: 56,
+            headerHeight: 64,
             headerPadding: '0 24px',
             bodyBg: '#ffffff',
           },
@@ -50,14 +50,14 @@ function App() {
             activeBarBorderWidth: 2,
             horizontalItemSelectedColor: '#ffffff',
             horizontalItemSelectedBg: 'rgba(255,255,255,0.2)',
-            fontSize: 14,
+            fontSize: 16,
           },
           Table: {
             headerBg: '#e6edf5',
             headerColor: '#333333',
             borderColor: '#cccccc',
-            cellPaddingBlock: 8,
-            cellPaddingInline: 12,
+            cellPaddingBlock: 12,
+            cellPaddingInline: 16,
           },
           Descriptions: {
             contentColor: '#000000',

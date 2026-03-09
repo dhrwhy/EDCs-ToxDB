@@ -68,93 +68,103 @@ const Browse: React.FC = () => {
   return (
     <Row gutter={24}>
       {/* 筛选面板 */}
-      <Col xs={24} md={6}>
+      <Col xs={24} md={5}>
         <div
           style={{
-            background: "#fafafa",
-            borderRadius: 8,
-            padding: 16,
+            background: "#ffffff",
+            border: "1px solid #cccccc",
+            borderRadius: 4,
             position: "sticky",
-            top: 88,
+            top: 100,
           }}
         >
-          <Title level={5}>{t("browse.filters")}</Title>
+          <div style={{ background: "#e6edf5", padding: "12px 16px", borderBottom: "1px solid #cccccc", borderRadius: "4px 4px 0 0" }}>
+            <Title level={5} style={{ fontSize: 16, margin: 0, color: "#1d3e70" }}>
+              {t("browse.filters")}
+            </Title>
+          </div>
 
-          <Divider style={{ margin: "12px 0" }} />
-          <Title level={5} style={{ fontSize: 14 }}>
-            {t("browse.tissueCategory")}
-          </Title>
-          <Checkbox.Group
-            options={filters?.tissue_categories ?? []}
-            value={selectedTissues}
-            onChange={(vals) => {
-              setSelectedTissues(vals as string[]);
-              handleFilterChange();
-            }}
-            style={{ display: "flex", flexDirection: "column", gap: 4 }}
-          />
+          <div style={{ padding: "16px" }}>
+            <Title level={5} style={{ fontSize: 15, marginBottom: 12, marginTop: 0, color: "#333" }}>
+              {t("browse.tissueCategory")}
+            </Title>
+            <div style={{ maxHeight: 220, overflowY: "auto", paddingRight: 8 }}>
+              <Checkbox.Group
+                options={filters?.tissue_categories ?? []}
+                value={selectedTissues}
+                onChange={(vals) => {
+                  setSelectedTissues(vals as string[]);
+                  handleFilterChange();
+                }}
+                style={{ display: "flex", flexDirection: "column", gap: 8 }}
+              />
+            </div>
 
-          <Divider style={{ margin: "12px 0" }} />
-          <Title level={5} style={{ fontSize: 14 }}>
-            {t("browse.libraryMethod")}
-          </Title>
-          <Checkbox.Group
-            options={filters?.library_methods ?? []}
-            value={selectedMethods}
-            onChange={(vals) => {
-              setSelectedMethods(vals as string[]);
-              handleFilterChange();
-            }}
-            style={{ display: "flex", flexDirection: "column", gap: 4 }}
-          />
+            <Divider style={{ margin: "20px 0" }} />
+            
+            <Title level={5} style={{ fontSize: 15, marginBottom: 12, color: "#333" }}>
+              {t("browse.libraryMethod")}
+            </Title>
+            <div style={{ maxHeight: 220, overflowY: "auto", paddingRight: 8 }}>
+              <Checkbox.Group
+                options={filters?.library_methods ?? []}
+                value={selectedMethods}
+                onChange={(vals) => {
+                  setSelectedMethods(vals as string[]);
+                  handleFilterChange();
+                }}
+                style={{ display: "flex", flexDirection: "column", gap: 8 }}
+              />
+            </div>
 
-          {filters?.year_range.min != null &&
-            filters?.year_range.max != null && (
-              <>
-                <Divider style={{ margin: "12px 0" }} />
-                <Title level={5} style={{ fontSize: 14 }}>
-                  {t("browse.publicationYear")}
-                </Title>
-                <Slider
-                  range
-                  min={filters.year_range.min}
-                  max={filters.year_range.max}
-                  value={yearRange ?? [filters.year_range.min, filters.year_range.max]}
-                  onChange={(val) => {
-                    setYearRange(val as [number, number]);
-                    handleFilterChange();
-                  }}
-                />
-                <Space>
-                  <InputNumber
-                    size="small"
+            {filters?.year_range.min != null &&
+              filters?.year_range.max != null && (
+                <>
+                  <Divider style={{ margin: "20px 0" }} />
+                  <Title level={5} style={{ fontSize: 15, marginBottom: 12, color: "#333" }}>
+                    {t("browse.publicationYear")}
+                  </Title>
+                  <Slider
+                    range
                     min={filters.year_range.min}
                     max={filters.year_range.max}
-                    value={yearRange?.[0]}
-                    onChange={(v) => {
-                      if (v != null && yearRange)
-                        setYearRange([v, yearRange[1]]);
+                    value={yearRange ?? [filters.year_range.min, filters.year_range.max]}
+                    onChange={(val) => {
+                      setYearRange(val as [number, number]);
+                      handleFilterChange();
                     }}
                   />
-                  <span>-</span>
-                  <InputNumber
-                    size="small"
-                    min={filters.year_range.min}
-                    max={filters.year_range.max}
-                    value={yearRange?.[1]}
-                    onChange={(v) => {
-                      if (v != null && yearRange)
-                        setYearRange([yearRange[0], v]);
-                    }}
-                  />
-                </Space>
-              </>
-            )}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      min={filters.year_range.min}
+                      max={filters.year_range.max}
+                      value={yearRange?.[0]}
+                      onChange={(v) => {
+                        if (v != null && yearRange)
+                          setYearRange([v, yearRange[1]]);
+                      }}
+                    />
+                    <span style={{ color: "#888" }}>-</span>
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      min={filters.year_range.min}
+                      max={filters.year_range.max}
+                      value={yearRange?.[1]}
+                      onChange={(v) => {
+                        if (v != null && yearRange)
+                          setYearRange([yearRange[0], v]);
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+          </div>
         </div>
       </Col>
 
       {/* 数据表格 */}
-      <Col xs={24} md={18}>
+      <Col xs={24} md={19}>
         <Spin spinning={loading}>
           <AnalysisTable
             items={items}

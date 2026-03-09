@@ -93,7 +93,6 @@ const AnalysisTable: React.FC<Props> = ({
       dataSource={items}
       loading={loading}
       bordered
-      size="middle"
       scroll={{ x: 1060 }}
       pagination={{
         current: page,

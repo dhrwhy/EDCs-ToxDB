@@ -55,14 +55,15 @@ const AppLayout: React.FC = () => {
           style={{
             display: "flex",
             alignItems: "center",
-            padding: "0 24px",
+            padding: "8px 32px",
             position: "relative",
+            minHeight: 70,
           }}
         >
           <div
             className="academic-header-title"
             style={{
-              marginRight: 40,
+              marginRight: 60,
               cursor: "pointer",
               whiteSpace: "nowrap",
             }}
@@ -103,10 +104,10 @@ const AppLayout: React.FC = () => {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 6,
-                  padding: "8px 20px",
+                  gap: 8,
+                  padding: "12px 24px",
                   cursor: "pointer",
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: 500,
                   borderRadius: "4px 4px 0 0",
                   color: active ? "#2b579a" : "rgba(255,255,255,0.9)",

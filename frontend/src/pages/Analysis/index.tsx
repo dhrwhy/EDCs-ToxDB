@@ -9,13 +9,11 @@ import {
   Spin,
   Empty,
   Breadcrumb,
-  Anchor,
   Row,
   Col,
-  Space,
 } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAnalysisDetail } from "../../api/analysis";
 import { downloadAsset } from "../../api/download";
@@ -32,7 +30,6 @@ const allKeys = ["basic", "sequencing", "tissue", "literature", "mesh", "samples
 
 const Analysis: React.FC = () => {
   const { analysisKey } = useParams<{ analysisKey: string }>();
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const [detail, setDetail] = useState<AnalysisDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -123,7 +120,7 @@ const Analysis: React.FC = () => {
       label: sectionLabels.basic,
       children: (
         <div id="section-basic">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }} size="small">
+          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
             <Descriptions.Item label={t("analysis.chemicalName")}>
               {summary.chemical_name}
             </Descriptions.Item>
@@ -157,7 +154,7 @@ const Analysis: React.FC = () => {
       label: sectionLabels.sequencing,
       children: (
         <div id="section-sequencing">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }} size="small">
+          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
             <Descriptions.Item label={t("analysis.gseId")}>
               {renderLink(summary.gse_id, externalLinks.geo)}
             </Descriptions.Item>
@@ -179,7 +176,7 @@ const Analysis: React.FC = () => {
       label: sectionLabels.tissue,
       children: (
         <div id="section-tissue">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }} size="small">
+          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
             <Descriptions.Item label={t("analysis.tissueCategory")}>
               {summary.tissue_category}
             </Descriptions.Item>
@@ -204,7 +201,7 @@ const Analysis: React.FC = () => {
       label: sectionLabels.literature,
       children: (
         <div id="section-literature">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }} size="small">
+          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
             <Descriptions.Item label={t("analysis.libraryMethod")}>
               {displayValue(summary.library_method)}
             </Descriptions.Item>
@@ -232,7 +229,7 @@ const Analysis: React.FC = () => {
       label: sectionLabels.mesh,
       children: (
         <div id="section-mesh">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }} size="small">
+          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
             <Descriptions.Item label="Class1">
               {displayValue(summary.class1_code)}
             </Descriptions.Item>
@@ -270,7 +267,6 @@ const Analysis: React.FC = () => {
             rowKey="srr_id"
             dataSource={sample_records}
             bordered
-            size="small"
             pagination={
               sample_records.length > 30
                 ? { pageSize: 30, showTotal: (total: number) => t("common.total", { count: total }) }
@@ -447,23 +443,21 @@ const Analysis: React.FC = () => {
             }}
           >
             <div style={{ marginBottom: 16 }}>
-              <Text strong style={{ fontSize: 15, color: "#1677ff" }}>
+              <Text strong style={{ fontSize: 18, color: "#1677ff" }}>
                 {detail.deseq_id}
               </Text>
             </div>
 
             <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
               <Button
-                size="small"
                 onClick={() => setActiveKeys(allKeys)}
-                style={{ flex: 1, fontSize: 12 }}
+                style={{ flex: 1, fontSize: 14 }}
               >
                 {t("analysis.showAll")}
               </Button>
               <Button
-                size="small"
                 onClick={() => setActiveKeys([])}
-                style={{ flex: 1, fontSize: 12 }}
+                style={{ flex: 1, fontSize: 14 }}
               >
                 {t("analysis.collapseAll")}
               </Button>

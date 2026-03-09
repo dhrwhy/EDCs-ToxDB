@@ -92,7 +92,6 @@ const DegTable: React.FC<Props> = ({ analysisKey, assets }) => {
         dataSource={data?.items ?? []}
         loading={loading}
         bordered
-        size="small"
         scroll={{ x: "max-content" }}
         pagination={{
           current: page,
