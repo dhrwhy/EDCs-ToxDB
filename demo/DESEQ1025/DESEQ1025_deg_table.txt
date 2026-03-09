@@ -1,0 +1,1 @@
+geneID	baseMean	log2FoldChange	lfcSE	stat	pvalue	padj	-log10(P.Value)	trend	ENTREZID

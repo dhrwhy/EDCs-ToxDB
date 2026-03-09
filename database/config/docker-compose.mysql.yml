@@ -1,0 +1,37 @@
+# ============================================================
+# MouseToxDB — MySQL 服务 Docker Compose 配置
+#
+# 仅包含 MySQL 服务部分, 供数据库独立调试使用
+# 完整项目部署请使用项目根目录的 docker-compose.yml
+#
+# 用法:
+#   cp .env.example .env
+#   docker compose -f docker-compose.mysql.yml up -d
+#   docker compose -f docker-compose.mysql.yml exec mysql mysql -u mousetoxdb -pmousetoxdb_pass mousetoxdb
+# ============================================================
+
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mousetoxdb}
+      MYSQL_USER: ${MYSQL_USER:-mousetoxdb}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mousetoxdb_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../sql/001_create_tables.sql:/docker-entrypoint-initdb.d/001_create_tables.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

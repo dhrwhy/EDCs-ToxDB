@@ -1,0 +1,57 @@
+from sqlalchemy import Column, BigInteger, Integer, SmallInteger, String, Text, DateTime
+from app.database import Base
+
+
+class MainRecord(Base):
+    __tablename__ = "main_records"
+
+    # 系统字段
+    record_pk = Column(BigInteger, primary_key=True, autoincrement=True)
+    analysis_key = Column(String(128), nullable=False, index=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+
+    # Excel 源字段（43 列）
+    sort_id = Column(Integer, nullable=False)
+    chemical_id = Column(Integer, nullable=False, index=True)
+    cas_id = Column(String(50), nullable=False, index=True)
+    inchi_key = Column(String(100), nullable=False, index=True)
+    chemical_name = Column(String(512), nullable=False)
+    alternative_names = Column(Text, nullable=True)
+    pubchem_cid = Column(String(50), nullable=False, index=True)
+    pubchem_name = Column(String(255), nullable=False)
+    deseq_id = Column(String(50), nullable=False, index=True)
+    from_group = Column(String(255), nullable=False)
+    evidence = Column(String(255), nullable=False)
+    gse_id = Column(String(50), nullable=False)
+    srr_id = Column(String(50), nullable=False)
+    bioproject_id = Column(String(50), nullable=False)
+    avg_spot_len = Column(Integer, nullable=False)
+    cell_type = Column(String(255), nullable=True)
+    library_layout = Column(String(20), nullable=False)
+    organism = Column(String(100), nullable=False)
+    platform = Column(String(50), nullable=False)
+    treatment = Column(String(255), nullable=True)
+    experiment_group = Column(String(20), nullable=False)
+    chem_name = Column(String(255), nullable=True)
+    dose = Column(String(100), nullable=True)
+    exposure_time = Column(String(100), nullable=True)
+    tissue_category = Column(String(100), nullable=False)
+    tissue_subcategory = Column(String(100), nullable=True)
+    reproductive_subcategory = Column(String(100), nullable=True)
+    tissue_or_cell_line = Column(String(255), nullable=False)
+    exposure_toxicant = Column(String(255), nullable=True)
+    library_method = Column(String(100), nullable=True)
+    library_method_detail = Column(String(100), nullable=True)
+    publication_year = Column(SmallInteger, nullable=True)
+    publication_month = Column(SmallInteger, nullable=True)
+    reference_title = Column(Text, nullable=True)
+    doi = Column(String(255), nullable=True)
+    class1_code = Column(String(20), nullable=False)
+    class2_code = Column(String(20), nullable=False)
+    class3_name = Column(String(100), nullable=True)
+    class4_name = Column(String(100), nullable=True)
+    class5_name = Column(String(100), nullable=True)
+    class6_name = Column(String(100), nullable=True)
+    class7_name = Column(String(100), nullable=True)
+    inferred_class = Column(String(100), nullable=True)
