@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout, Menu, Button } from "antd";
+import { Layout, Button } from "antd";
 import {
   HomeOutlined,
   UnorderedListOutlined,
@@ -19,7 +19,7 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const { t, i18n } = useTranslation();
 
-  const menuItems = [
+  const navItems = [
     { key: "/", icon: <HomeOutlined />, label: t("nav.home") },
     { key: "/browse", icon: <UnorderedListOutlined />, label: t("nav.browse") },
     { key: "/download", icon: <DownloadOutlined />, label: t("nav.download") },
@@ -37,66 +37,107 @@ const AppLayout: React.FC = () => {
     localStorage.setItem("lang", next);
   };
 
-  const selectedKey =
-    menuItems.find(
-      (item) => item.key !== "/" && location.pathname.startsWith(item.key)
-    )?.key ?? "/";
+  const isActive = (key: string) => {
+    if (key === "/") return location.pathname === "/";
+    return location.pathname.startsWith(key);
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header
+      <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          background: "#fff",
-          borderBottom: "1px solid #f0f0f0",
-          padding: "0 24px",
           position: "sticky",
           top: 0,
           zIndex: 100,
         }}
       >
-        <div
+        <Header
           style={{
-            fontWeight: 700,
-            fontSize: 20,
-            color: "#1677ff",
-            marginRight: 40,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
+            display: "flex",
+            alignItems: "center",
+            padding: "0 24px",
+            position: "relative",
           }}
-          onClick={() => navigate("/")}
         >
-          MouseToxDB
-        </div>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[selectedKey]}
-          items={menuItems}
-          onClick={({ key }) => navigate(key)}
-          style={{ flex: 1, border: "none" }}
-        />
-        <div style={{ marginLeft: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <div
+            className="academic-header-title"
+            style={{
+              marginRight: 40,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+            onClick={() => navigate("/")}
+          >
+            MouseToxDB
+          </div>
+          <div style={{ flex: 1 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <SearchBox onSearch={handleNavSearch} compact />
           <Button
             type="text"
             icon={<GlobalOutlined />}
             onClick={toggleLang}
-            style={{ fontWeight: 500 }}
+            style={{ fontWeight: 500, color: "#ffffff" }}
           >
             {i18n.language === "zh" ? "EN" : "中"}
           </Button>
-        </div>
-      </Header>
+          </div>
+        </Header>
 
-      <Content style={{ padding: "24px 48px", background: "#f5f5f5" }}>
+        {/* Tab-style navigation bar */}
+        <nav
+          style={{
+            display: "flex",
+            gap: 2,
+            padding: "0 24px",
+            background: "#2b579a",
+            borderTop: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          {navItems.map((item) => {
+            const active = isActive(item.key);
+            return (
+              <div
+                key={item.key}
+                onClick={() => navigate(item.key)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 20px",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  borderRadius: "4px 4px 0 0",
+                  color: active ? "#2b579a" : "rgba(255,255,255,0.9)",
+                  background: active ? "#ffffff" : "transparent",
+                  borderTop: active ? "3px solid #e8a735" : "3px solid transparent",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.background = "transparent";
+                  }
+                }}
+              >
+                {item.icon}
+                {item.label}
+              </div>
+            );
+          })}
+        </nav>
+      </div>
+
+      <Content className="ant-layout-content" style={{ background: "#ffffff" }}>
         <div
           style={{
-            maxWidth: 1400,
+            maxWidth: 1600,
             margin: "0 auto",
-            background: "#fff",
-            borderRadius: 8,
-            padding: 24,
             minHeight: 600,
           }}
         >
@@ -104,7 +145,7 @@ const AppLayout: React.FC = () => {
         </div>
       </Content>
 
-      <Footer style={{ textAlign: "center", color: "#999" }}>
+      <Footer style={{ textAlign: "center", color: "#666", borderTop: "1px solid #ccc", padding: "12px 0", background: "#f5f5f5" }}>
         MouseToxDB &copy; 2026 — {t("common.subtitle")}
       </Footer>
     </Layout>

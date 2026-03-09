@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, theme } from "antd";
 import zhCN from "antd/locale/zh_CN";
 import enUS from "antd/locale/en_US";
 import { useTranslation } from "react-i18next";
@@ -17,7 +17,55 @@ function App() {
   const antdLocale = i18n.language === "en" ? enUS : zhCN;
 
   return (
-    <ConfigProvider locale={antdLocale}>
+    <ConfigProvider 
+      locale={antdLocale}
+      theme={{
+        algorithm: theme.compactAlgorithm,
+        token: {
+          colorPrimary: '#2b579a',
+          colorLink: '#0033cc',
+          fontFamily: 'Arial, Helvetica, sans-serif',
+          fontSize: 14,
+          borderRadius: 2,
+          colorTextHeading: '#333333',
+          colorBgContainer: '#ffffff',
+          colorBorderSecondary: '#cccccc',
+        },
+        components: {
+          Layout: {
+            headerBg: '#2b579a',
+            headerColor: '#ffffff',
+            headerHeight: 56,
+            headerPadding: '0 24px',
+            bodyBg: '#ffffff',
+          },
+          Menu: {
+            itemBg: 'transparent',
+            itemColor: 'rgba(255,255,255,0.85)',
+            itemHoverColor: '#ffffff',
+            itemHoverBg: 'rgba(255,255,255,0.12)',
+            itemSelectedColor: '#ffffff',
+            itemSelectedBg: 'rgba(255,255,255,0.2)',
+            activeBarHeight: 2,
+            activeBarBorderWidth: 2,
+            horizontalItemSelectedColor: '#ffffff',
+            horizontalItemSelectedBg: 'rgba(255,255,255,0.2)',
+            fontSize: 14,
+          },
+          Table: {
+            headerBg: '#e6edf5',
+            headerColor: '#333333',
+            borderColor: '#cccccc',
+            cellPaddingBlock: 8,
+            cellPaddingInline: 12,
+          },
+          Descriptions: {
+            contentColor: '#000000',
+            titleColor: '#333333',
+          }
+        }
+      }}
+    >
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>

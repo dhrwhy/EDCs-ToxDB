@@ -94,7 +94,7 @@ const AnalysisTable: React.FC<Props> = ({
       loading={loading}
       bordered
       size="middle"
-      scroll={{ x: "max-content" }}
+      scroll={{ x: 1060 }}
       pagination={{
         current: page,
         pageSize,
