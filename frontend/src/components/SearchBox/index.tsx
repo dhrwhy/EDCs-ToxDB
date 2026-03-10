@@ -36,6 +36,8 @@ const SearchBox: React.FC<Props> = ({
     }
   };
 
+  const isMobile = window.innerWidth < 768;
+
   if (compact) {
     return (
       <Input.Search
@@ -43,22 +45,24 @@ const SearchBox: React.FC<Props> = ({
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         onSearch={handleSearch}
-        style={{ width: 240 }}
+        style={{ width: isMobile ? "100%" : 240 }}
         enterButton={<SearchOutlined />}
       />
     );
   }
 
   return (
-    <Space.Compact size="large" style={{ width: "100%", maxWidth: 700 }}>
-      <Select
-        value={category}
-        onChange={setCategory}
-        options={categoryOptions}
-        style={{ width: 160 }}
-      />
+    <Space.Compact size={isMobile ? "middle" : "large"} style={{ width: "100%", maxWidth: 700 }}>
+      {!isMobile && (
+        <Select
+          value={category}
+          onChange={setCategory}
+          options={categoryOptions}
+          style={{ width: 160 }}
+        />
+      )}
       <Input.Search
-        placeholder={t("search.placeholderFull")}
+        placeholder={isMobile ? t("search.placeholderCompact") : t("search.placeholderFull")}
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         onSearch={handleSearch}

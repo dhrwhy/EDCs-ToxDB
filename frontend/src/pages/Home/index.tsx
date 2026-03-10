@@ -45,8 +45,10 @@ const Home: React.FC = () => {
     t("home.database"),
   ];
 
+  const isMobile = window.innerWidth < 768;
+
   return (
-    <div style={{ paddingBottom: 60 }}>
+    <div style={{ paddingBottom: isMobile ? 30 : 60 }}>
       {/* Hero Banner 区域 (带有网络背景图和深蓝遮罩) */}
       <div
         style={{
@@ -54,25 +56,26 @@ const Home: React.FC = () => {
           backgroundImage: `linear-gradient(rgba(29, 62, 112, 0.8), rgba(42, 82, 152, 0.9)), url(${bannerBg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          padding: "100px 20px 130px",
+          padding: isMobile ? "50px 16px 80px" : "100px 20px 130px",
           textAlign: "center",
           color: "#ffffff",
           boxShadow: "inset 0 -10px 20px rgba(0,0,0,0.1)",
         }}
       >
-        <Title level={1} style={{ color: "#ffffff", fontSize: 48, letterSpacing: 2, marginBottom: 12, marginTop: 0 }}>
+        <Title level={1} style={{ color: "#ffffff", fontSize: isMobile ? 28 : 48, letterSpacing: 2, marginBottom: 12, marginTop: 0 }}>
           MouseToxDB
         </Title>
-        <div style={{ fontSize: 20, color: "#e0e8f5", marginBottom: 20 }}>
+        <div style={{ fontSize: isMobile ? 14 : 20, color: "#e0e8f5", marginBottom: 16 }}>
           {t("common.subtitle")}
         </div>
         <Paragraph
           style={{
             maxWidth: 800,
-            margin: "0 auto 40px",
+            margin: isMobile ? "0 auto 24px" : "0 auto 40px",
             color: "#c8d9ed",
-            fontSize: 16,
+            fontSize: isMobile ? 13 : 16,
             lineHeight: 1.6,
+            padding: isMobile ? "0 8px" : 0,
           }}
         >
           {t("home.description")}
@@ -85,16 +88,17 @@ const Home: React.FC = () => {
             justifyContent: "center",
             maxWidth: 900,
             margin: "0 auto",
+            padding: isMobile ? "0 8px" : 0,
           }}
         >
-          <div style={{ background: "#ffffff", padding: 10, borderRadius: 6, width: "100%", boxShadow: "0 4px 15px rgba(0,0,0,0.2)" }}>
+          <div style={{ background: "#ffffff", padding: isMobile ? 6 : 10, borderRadius: 6, width: "100%", boxShadow: "0 4px 15px rgba(0,0,0,0.2)" }}>
             <SearchBox onSearch={handleSearch} />
           </div>
         </div>
       </div>
 
       {/* 悬浮数据统计卡片 (负 margin 向上覆盖在 Banner 底部) */}
-      <div style={{ maxWidth: 1400, margin: "-55px auto 50px", position: "relative", zIndex: 10, padding: "0 20px" }}>
+      <div style={{ maxWidth: 1400, margin: isMobile ? "-40px auto 30px" : "-55px auto 50px", position: "relative", zIndex: 10, padding: isMobile ? "0 12px" : "0 20px" }}>
         <Spin spinning={loading}>
           <Row gutter={[24, 24]}>
             <Col xs={12} sm={6}>
@@ -157,45 +161,46 @@ const Home: React.FC = () => {
         </Spin>
       </div>
 
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 20px" }}>
-        <Row gutter={[40, 40]}>
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: isMobile ? "0 12px" : "0 20px" }}>
+        <Row gutter={isMobile ? [16, 16] : [40, 40]}>
           {/* 左侧：分析流程 */}
           <Col xs={24} md={16}>
-            <div style={{ background: "#f8f9fa", border: "1px solid #e6edf5", borderRadius: 6, padding: "24px 32px", height: "100%" }}>
-              <Title level={4} style={{ color: "#1d3e70", borderBottom: "3px solid #2b579a", paddingBottom: 10, display: "inline-block", marginTop: 0, fontSize: 20 }}>
+            <div style={{ background: "#f8f9fa", border: "1px solid #e6edf5", borderRadius: 6, padding: isMobile ? "16px" : "24px 32px", height: "100%" }}>
+              <Title level={4} style={{ color: "#1d3e70", borderBottom: "3px solid #2b579a", paddingBottom: 10, display: "inline-block", marginTop: 0, fontSize: isMobile ? 16 : 20 }}>
                 {t("home.pipeline")}
               </Title>
               <div
                 style={{
                   display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  marginTop: 32,
-                  flexWrap: "nowrap",
-                  overflowX: "auto"
+                  marginTop: isMobile ? 16 : 32,
+                  gap: isMobile ? 0 : undefined,
                 }}
               >
                 {pipelineSteps.map((step, i, arr) => (
                   <React.Fragment key={step}>
                     <div
                       style={{
-                        flex: 1,
+                        flex: isMobile ? undefined : 1,
+                        width: isMobile ? "100%" : undefined,
                         textAlign: "center",
                         background: "#ffffff",
                         border: "2px solid #2b579a",
                         color: "#1d3e70",
-                        padding: "14px 8px",
+                        padding: isMobile ? "10px 8px" : "14px 8px",
                         fontWeight: "bold",
                         borderRadius: 4,
-                        minWidth: 120,
-                        fontSize: 15,
+                        minWidth: isMobile ? undefined : 120,
+                        fontSize: isMobile ? 13 : 15,
                         boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
                       }}
                     >
                       {step}
                     </div>
                     {i < arr.length - 1 && (
-                      <div style={{ padding: "0 12px", color: "#2b579a", fontSize: 18 }}>
+                      <div style={{ padding: isMobile ? "4px 0" : "0 12px", color: "#2b579a", fontSize: 18, transform: isMobile ? "rotate(90deg)" : undefined }}>
                         <RightOutlined />
                       </div>
                     )}
@@ -207,7 +212,7 @@ const Home: React.FC = () => {
 
           {/* 右侧：外部链接与资源 */}
           <Col xs={24} md={8}>
-            <div style={{ background: "#f8f9fa", border: "1px solid #e6edf5", borderRadius: 6, padding: "24px 32px", height: "100%" }}>
+            <div style={{ background: "#f8f9fa", border: "1px solid #e6edf5", borderRadius: 6, padding: isMobile ? "16px" : "24px 32px", height: "100%" }}>
               <Title level={4} style={{ color: "#1d3e70", borderBottom: "3px solid #2b579a", paddingBottom: 10, display: "inline-block", marginTop: 0, fontSize: 20 }}>
                 {t("home.externalResources")}
               </Title>

@@ -136,3 +136,60 @@ a:hover {
 .ant-descriptions-row:last-child .ant-descriptions-item-content {
   border-bottom: none !important;
 }
+
+/* ========== Mobile Responsive ========== */
+@media (max-width: 767px) {
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+
+  /* Descriptions: reduce padding on mobile */
+  .ant-descriptions-item-label {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .ant-descriptions-item-content {
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+  }
+
+  /* Table: reduce cell padding */
+  .ant-table {
+    font-size: 12px;
+  }
+
+  /* Card adjustments */
+  .ant-card-body {
+    padding: 8px !important;
+  }
+
+  .ant-card-head {
+    padding: 0 8px !important;
+  }
+
+  /* Academic header title */
+  .academic-header-title {
+    font-size: 18px;
+  }
+
+  /* Collapse panel adjustments */
+  .ant-collapse-header {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Breadcrumb */
+  .ant-breadcrumb {
+    font-size: 12px;
+  }
+
+  /* Statistic card values */
+  .ant-statistic-content-value {
+    font-size: 24px !important;
+  }
+
+  .ant-statistic-title span {
+    font-size: 12px !important;
+  }
+}

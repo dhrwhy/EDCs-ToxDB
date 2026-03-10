@@ -426,7 +426,7 @@ const Analysis: React.FC = () => {
         ]}
       />
 
-      <Title level={4} style={{ marginBottom: 24 }}>
+      <Title level={4} style={{ marginBottom: 16, fontSize: window.innerWidth < 768 ? 16 : undefined, wordBreak: "break-word" }}>
         {detail.deseq_id} — {summary.chemical_name}
       </Title>
 

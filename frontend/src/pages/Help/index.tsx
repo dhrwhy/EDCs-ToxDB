@@ -59,6 +59,7 @@ const Help: React.FC = () => {
           pagination={false}
           bordered
           size="small"
+          scroll={{ x: "max-content" }}
         />
       </Card>
 

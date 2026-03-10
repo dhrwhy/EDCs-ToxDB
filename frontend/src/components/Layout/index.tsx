@@ -1,5 +1,5 @@
-import React from "react";
-import { Layout, Button } from "antd";
+import React, { useState, useEffect } from "react";
+import { Layout, Button, Drawer } from "antd";
 import {
   HomeOutlined,
   UnorderedListOutlined,
@@ -7,6 +7,8 @@ import {
   BarChartOutlined,
   QuestionCircleOutlined,
   GlobalOutlined,
+  MenuOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,10 +16,27 @@ import SearchBox from "../SearchBox";
 
 const { Header, Content, Footer } = Layout;
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return isMobile;
+};
+
 const AppLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
+  const isMobile = useIsMobile();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
 
   const navItems = [
     { key: "/", icon: <HomeOutlined />, label: t("nav.home") },
@@ -55,46 +74,115 @@ const AppLayout: React.FC = () => {
           style={{
             display: "flex",
             alignItems: "center",
-            padding: "8px 32px",
+            padding: isMobile ? "8px 12px" : "8px 32px",
             position: "relative",
-            minHeight: 70,
+            minHeight: isMobile ? 56 : 70,
           }}
         >
+          {isMobile && (
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setDrawerOpen(true)}
+              style={{ color: "#ffffff", fontSize: 20, marginRight: 8 }}
+            />
+          )}
           <div
             className="academic-header-title"
             style={{
-              marginRight: 60,
+              marginRight: isMobile ? 0 : 60,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              fontSize: isMobile ? 18 : undefined,
             }}
             onClick={() => navigate("/")}
           >
             MouseToxDB
           </div>
           <div style={{ flex: 1 }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <SearchBox onSearch={handleNavSearch} compact />
-          <Button
-            type="text"
-            icon={<GlobalOutlined />}
-            onClick={toggleLang}
-            style={{ fontWeight: 500, color: "#ffffff" }}
-          >
-            {i18n.language === "zh" ? "EN" : "中"}
-          </Button>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 4 : 12 }}>
+            {!isMobile && <SearchBox onSearch={handleNavSearch} compact />}
+            <Button
+              type="text"
+              icon={<GlobalOutlined />}
+              onClick={toggleLang}
+              style={{ fontWeight: 500, color: "#ffffff" }}
+            >
+              {i18n.language === "zh" ? "EN" : "中"}
+            </Button>
           </div>
         </Header>
 
-        {/* Tab-style navigation bar */}
-        <nav
-          style={{
-            display: "flex",
-            gap: 2,
-            padding: "0 24px",
-            background: "#2b579a",
-            borderTop: "1px solid rgba(255,255,255,0.1)",
-          }}
-        >
+        {/* Desktop: Tab-style navigation bar */}
+        {!isMobile && (
+          <nav
+            style={{
+              display: "flex",
+              gap: 2,
+              padding: "0 24px",
+              background: "#2b579a",
+              borderTop: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            {navItems.map((item) => {
+              const active = isActive(item.key);
+              return (
+                <div
+                  key={item.key}
+                  onClick={() => navigate(item.key)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "12px 24px",
+                    cursor: "pointer",
+                    fontSize: 16,
+                    fontWeight: 500,
+                    borderRadius: "4px 4px 0 0",
+                    color: active ? "#2b579a" : "rgba(255,255,255,0.9)",
+                    background: active ? "#ffffff" : "transparent",
+                    borderTop: active ? "3px solid #e8a735" : "3px solid transparent",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.background = "transparent";
+                    }
+                  }}
+                >
+                  {item.icon}
+                  {item.label}
+                </div>
+              );
+            })}
+          </nav>
+        )}
+      </div>
+
+      {/* Mobile drawer navigation */}
+      <Drawer
+        title={
+          <span style={{ color: "#2b579a", fontWeight: "bold", fontSize: 18 }}>
+            MouseToxDB
+          </span>
+        }
+        placement="left"
+        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+        width={280}
+        closeIcon={<CloseOutlined style={{ fontSize: 16 }} />}
+        styles={{ body: { padding: 0 } }}
+      >
+        {/* Mobile search */}
+        <div style={{ padding: "12px 16px", borderBottom: "1px solid #f0f0f0" }}>
+          <SearchBox onSearch={handleNavSearch} compact />
+        </div>
+        <div style={{ padding: "8px 0" }}>
           {navItems.map((item) => {
             const active = isActive(item.key);
             return (
@@ -102,28 +190,16 @@ const AppLayout: React.FC = () => {
                 key={item.key}
                 onClick={() => navigate(item.key)}
                 style={{
-                  display: "inline-flex",
+                  display: "flex",
                   alignItems: "center",
-                  gap: 8,
-                  padding: "12px 24px",
+                  gap: 12,
+                  padding: "14px 24px",
                   cursor: "pointer",
-                  fontSize: 16,
-                  fontWeight: 500,
-                  borderRadius: "4px 4px 0 0",
-                  color: active ? "#2b579a" : "rgba(255,255,255,0.9)",
-                  background: active ? "#ffffff" : "transparent",
-                  borderTop: active ? "3px solid #e8a735" : "3px solid transparent",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.15)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.background = "transparent";
-                  }
+                  fontSize: 15,
+                  fontWeight: active ? 600 : 400,
+                  color: active ? "#2b579a" : "#333",
+                  background: active ? "#e6edf5" : "transparent",
+                  borderLeft: active ? "3px solid #2b579a" : "3px solid transparent",
                 }}
               >
                 {item.icon}
@@ -131,8 +207,8 @@ const AppLayout: React.FC = () => {
               </div>
             );
           })}
-        </nav>
-      </div>
+        </div>
+      </Drawer>
 
       <Content className="ant-layout-content" style={{ background: "#ffffff" }}>
         <div
@@ -146,7 +222,7 @@ const AppLayout: React.FC = () => {
         </div>
       </Content>
 
-      <Footer style={{ textAlign: "center", color: "#666", borderTop: "1px solid #ccc", padding: "12px 0", background: "#f5f5f5" }}>
+      <Footer style={{ textAlign: "center", color: "#666", borderTop: "1px solid #ccc", padding: "12px 0", background: "#f5f5f5", fontSize: isMobile ? 12 : 14 }}>
         MouseToxDB &copy; 2026 — {t("common.subtitle")}
       </Footer>
     </Layout>
