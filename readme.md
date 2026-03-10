@@ -13,6 +13,7 @@ MouseToxDB 是一个公开访问、只读型的科研数据库检索与展示网
 | UI 组件库 | Ant Design | 6.3 |
 | 路由 | React Router | v7 |
 | HTTP 客户端 | Axios | 1.13 |
+| 图表 | ECharts + echarts-for-react | ECharts 6, echarts-for-react 3 |
 | 国际化 | i18next + react-i18next | — |
 | 后端框架 | FastAPI | latest |
 | ORM | SQLAlchemy | >= 2.0 |
@@ -37,7 +38,7 @@ SDNU/
 │   │   │   ├── stats.ts               #   统计摘要 API
 │   │   │   └── download.ts            #   下载/导出（浏览器直接下载）
 │   │   ├── components/                # 可复用 UI 组件
-│   │   │   ├── Layout/index.tsx       #   全局布局（双层导航栏 + 页脚）
+│   │   │   ├── Layout/index.tsx       #   全局布局（双层导航栏 + 页脚 + 移动端汉堡菜单）
 │   │   │   ├── SearchBox/index.tsx    #   搜索框（支持分类下拉 + 紧凑模式）
 │   │   │   ├── AnalysisTable/index.tsx#   分析条目分页表格
 │   │   │   ├── DegTable/index.tsx     #   DEG 差异基因分页表格
@@ -48,9 +49,9 @@ SDNU/
 │   │   │   ├── zh.json               #   中文翻译（130+ 条目）
 │   │   │   └── en.json               #   英文翻译
 │   │   ├── pages/                     # 页面组件（路由对应）
-│   │   │   ├── Home/index.tsx         #   首页：Hero 横幅 + 搜索框 + 统计卡片 + 流程图 + 外部链接
+│   │   │   ├── Home/index.tsx         #   首页：Hero 横幅 + 搜索框 + 统计卡片 + 亮点/旭日图 + 流程图 + 外部链接
 │   │   │   ├── Search/index.tsx       #   搜索结果页
-│   │   │   ├── Browse/index.tsx       #   浏览页：侧边栏筛选 + 表格
+│   │   │   ├── Browse/index.tsx       #   浏览页：侧边栏筛选 + 表格（移动端可折叠筛选面板）
 │   │   │   ├── Analysis/index.tsx     #   详情页：面包屑 + 侧边导航 + 8 个折叠面板
 │   │   │   ├── Download/index.tsx     #   下载页
 │   │   │   ├── Statistics/index.tsx   #   统计页
@@ -206,7 +207,7 @@ SDNU/
 
 | 路由 | 页面 | 功能 |
 |------|------|------|
-| `/` | 首页 | Hero 横幅 + 搜索框 + 统计卡片（986/81/36/78）+ 分析流程图 + 外部链接 |
+| `/` | 首页 | Hero 横幅 + 搜索框 + 统计卡片 + 亮点/统计旭日图 + 分析流程图 + 外部链接 |
 | `/search?keyword=&category=` | 搜索结果页 | 搜索框 + 结果表格（分页 30 条）+ 导出按钮 |
 | `/browse` | 浏览页 | 左侧筛选面板（组织分类/建库方法/发表年份）+ 右侧数据表格 |
 | `/analysis/:analysisKey` | 详情页 | 面包屑导航 + 侧边导航 + 8 个可折叠面板 |
@@ -236,7 +237,29 @@ SDNU/
 - 导航栏右上角提供语言切换按钮
 - Ant Design 组件库同步切换 locale（分页器、空状态等）
 
-### 5.4 UI 风格
+### 5.4 首页模块
+
+首页自上而下包含以下区块：
+
+1. **Hero 横幅**：深蓝渐变背景 + 标题 + 副标题 + 描述文字 + 居中大搜索框
+2. **统计卡片**：4 张悬浮卡片（样本记录 / 分析条目 / 化学物种类 / DESEQ 分析数），负 margin 覆盖在 Banner 底部
+3. **亮点 + 统计总览**（并排两列）：
+   - 左侧「数据库亮点」：4 个 CheckCircle 图标特色要点
+   - 右侧「统计总览」：ECharts 旭日图（内环 4 大类：文献/数据集/样本/化学物，外环展示具体指标），等分扇区，点击跳转浏览页
+4. **分析流程 + 外部资源**（并排两列）：5 步流程图（FASTQ → QC → DESeq2 → 富集分析 → 数据库）+ 外部学术资源链接
+
+### 5.5 移动端适配
+
+全站支持移动端响应式布局（断点 `768px`）：
+
+- **导航栏**：汉堡菜单 + Drawer 侧边抽屉（含搜索框 + 导航项），路由切换自动关闭
+- **首页**：Hero 区缩小字号和间距，统计卡片 2×2 排列，流程图竖向排列
+- **浏览页**：筛选面板折叠为 `Collapse` 手风琴，显示已选筛选项计数徽标
+- **详情页**：标题自动缩小，长文本自动换行
+- **帮助页**：字段说明表格横向可滚动
+- **全局 CSS**：`@media (max-width: 767px)` 减小各区块内边距
+
+### 5.6 UI 风格
 
 - 学术风格主题色：`#2b579a`（深蓝）
 - 双层导航栏：上层（Logo + 搜索框 + 语言切换），下层（标签页式菜单，选中项显示 `#e8a735` 金色顶部边框）
@@ -583,3 +606,48 @@ docker compose exec backend python scripts/scan_assets.py
 | `ASSETS_DIR` | /data/deseq_assets | 资源文件目录 |
 | `EXCEL_PATH` | /data/source_excel/260307小鼠双端信息全.xlsx | 源数据 Excel 路径 |
 | `STATISTICS_DIR` | /data/statistics | 统计图片目录 |
+| `URL_PREFIX` | （空） | 子路径部署前缀（如 `/SDNU`），用于生成资源 URL |
+
+---
+
+## 10. 服务器部署（子路径方式）
+
+项目已部署在 Vultr VPS 上，通过 `2584256188.work/SDNU` 访问，与同服务器的 WordPress 博客共存。
+
+### 10.1 部署架构
+
+```
+Nginx (80/443)
+├── /              → WordPress (PHP-FPM)
+├── ^~ /SDNU/      → /var/www/SDNU/ (symlink → dist/)  # 前端 SPA
+├── ^~ /SDNU/api/  → proxy_pass http://127.0.0.1:8001  # 后端 API
+└── ^~ /SDNU/static/ → proxy_pass http://127.0.0.1:8001 # 静态资源
+```
+
+### 10.2 子路径适配要点
+
+| 配置项 | 修改内容 |
+|--------|---------|
+| `vite.config.ts` | `base: '/SDNU/'` |
+| `App.tsx` | `<BrowserRouter basename="/SDNU">` |
+| `api/index.ts` | `baseURL: '/SDNU/api'` |
+| `api/download.ts` | 下载 URL 添加 `/SDNU` 前缀 |
+| 后端 `.env` | `URL_PREFIX=/SDNU` |
+| 后端 `analysis_service.py` | 资源 URL 使用 `settings.URL_PREFIX` 前缀 |
+
+### 10.3 后端服务
+
+后端以 systemd 服务运行：
+
+```ini
+# /etc/systemd/system/mousetoxdb.service
+[Service]
+WorkingDirectory=/root/Web/SDNU/backend
+ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8001
+```
+
+### 10.4 Nginx 注意事项
+
+- 使用 `^~` 前缀匹配（优先于 WordPress 的 regex location）
+- 前端使用 `root /var/www` + symlink `/var/www/SDNU → dist/`（`alias` + `try_files` 在 Nginx 中不兼容）
+- 需确保 Nginx worker（`www-data`）对项目目录有遍历权限

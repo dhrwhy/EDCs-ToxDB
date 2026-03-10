@@ -53,7 +53,17 @@
     "enrichment": "富集分析（KEGG / Reactome / Hallmark / DO）",
     "database": "MouseToxDB 数据库",
     "externalResources": "常用外部资源",
-    "geo": "GEO 数据库"
+    "geo": "GEO 数据库",
+    "highlights": "数据库亮点",
+    "highlightData": "整合 7,000+ 条样本数据信息",
+    "highlightTissue": "覆盖多种组织系统（肝脏、生殖、心脏、肺等）",
+    "highlightOmics": "转录组学差异表达分析（DESeq2）",
+    "highlightPipeline": "标准化分析流程与富集通路注释",
+    "statsOverview": "统计总览",
+    "statsLiterature": "文献",
+    "statsDatasets": "数据集",
+    "statsSamples": "样本",
+    "statsChemicals": "化学物"
   },
   "browse": {
     "filters": "筛选条件",

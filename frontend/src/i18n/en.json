@@ -53,7 +53,17 @@
     "enrichment": "Enrichment (KEGG / Reactome / Hallmark / DO)",
     "database": "MouseToxDB Database",
     "externalResources": "External Resources",
-    "geo": "GEO Database"
+    "geo": "GEO Database",
+    "highlights": "Highlights",
+    "highlightData": "Integrating 7,000+ sample data records",
+    "highlightTissue": "Covering multiple tissue systems (liver, reproductive, heart, lung, etc.)",
+    "highlightOmics": "Transcriptomic differential expression analysis (DESeq2)",
+    "highlightPipeline": "Standardized analysis pipeline with pathway enrichment",
+    "statsOverview": "Statistics Overview",
+    "statsLiterature": "Literature",
+    "statsDatasets": "Datasets",
+    "statsSamples": "Samples",
+    "statsChemicals": "Chemicals"
   },
   "browse": {
     "filters": "Filters",

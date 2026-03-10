@@ -6,14 +6,22 @@ import {
   ClusterOutlined,
   FileSearchOutlined,
   RightOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ReactEChartsCore from "echarts-for-react/lib/core";
+import * as echarts from "echarts/core";
+import { SunburstChart } from "echarts/charts";
+import { TooltipComponent } from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
 import SearchBox from "../../components/SearchBox";
 import { getStatsSummary } from "../../api/stats";
 import type { StatsSummary } from "../../types";
 import ExternalLink from "../../components/ExternalLink";
 import bannerBg from "../../assets/banner.svg";
+
+echarts.use([SunburstChart, TooltipComponent, CanvasRenderer]);
 
 const { Title, Paragraph } = Typography;
 
@@ -22,7 +30,6 @@ const Home: React.FC = () => {
   const { t } = useTranslation();
   const [stats, setStats] = useState<StatsSummary | null>(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     getStatsSummary()
       .then((res) => {
@@ -161,6 +168,121 @@ const Home: React.FC = () => {
         </Spin>
       </div>
 
+      {/* 亮点 + 统计总览 */}
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: isMobile ? "0 12px" : "0 20px", marginBottom: isMobile ? 16 : 40 }}>
+        <Row gutter={isMobile ? [16, 16] : [40, 40]}>
+          {/* 左侧：亮点 */}
+          <Col xs={24} md={12}>
+            <div style={{ background: "#f8f9fa", border: "1px solid #e6edf5", borderRadius: 6, padding: isMobile ? "16px" : "24px 32px", height: "100%" }}>
+              <Title level={4} style={{ color: "#1d3e70", borderBottom: "3px solid #2b579a", paddingBottom: 10, display: "inline-block", marginTop: 0, fontSize: isMobile ? 16 : 20 }}>
+                {t("home.highlights")}
+              </Title>
+              <div style={{ marginTop: isMobile ? 12 : 20, display: "flex", flexDirection: "column", gap: isMobile ? 14 : 20 }}>
+                {[
+                  t("home.highlightData"),
+                  t("home.highlightTissue"),
+                  t("home.highlightOmics"),
+                  t("home.highlightPipeline"),
+                ].map((text, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                    <CheckCircleOutlined style={{ color: "#2b579a", fontSize: 20, marginTop: 2, flexShrink: 0 }} />
+                    <span style={{ fontSize: isMobile ? 13 : 15, color: "#333", lineHeight: 1.6 }}>{text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Col>
+
+          {/* 右侧：统计总览旭日图 */}
+          <Col xs={24} md={12}>
+            <div style={{ background: "#f8f9fa", border: "1px solid #e6edf5", borderRadius: 6, padding: isMobile ? "16px" : "24px 32px", height: "100%" }}>
+              <Title level={4} style={{ color: "#1d3e70", borderBottom: "3px solid #2b579a", paddingBottom: 10, display: "inline-block", marginTop: 0, fontSize: isMobile ? 16 : 20 }}>
+                {t("home.statsOverview")}
+              </Title>
+              {stats && (
+                <ReactEChartsCore
+                  echarts={echarts}
+                  option={{
+                    tooltip: {
+                      trigger: "item",
+                      formatter: (params: { name: string }) => params.name,
+                    },
+                    series: [
+                      {
+                        type: "sunburst",
+                        center: ["50%", "50%"],
+                        radius: ["15%", "75%"],
+                        sort: undefined,
+                        nodeClick: false,
+                        emphasis: { focus: "ancestor" },
+                        itemStyle: { borderWidth: 2, borderColor: "#f8f9fa" },
+                        label: {
+                          fontSize: isMobile ? 11 : 13,
+                          color: "#333",
+                        },
+                        levels: [
+                          {},
+                          {
+                            r0: "20%",
+                            r: "48%",
+                            label: { fontSize: isMobile ? 11 : 13, fontWeight: "bold", color: "#fff", rotate: "tangential" },
+                            itemStyle: { borderWidth: 2 },
+                          },
+                          {
+                            r0: "48%",
+                            r: "72%",
+                            label: { fontSize: isMobile ? 9 : 11, rotate: "tangential", color: "#333" },
+                            itemStyle: { borderWidth: 1 },
+                          },
+                        ],
+                        data: [
+                          {
+                            name: t("home.statsLiterature"),
+                            itemStyle: { color: "#3a7bd5" },
+                            children: [
+                              { name: `GSE (${stats.unique_gse_id})`, value: 50, itemStyle: { color: "#5b9bd5" } },
+                              { name: `BioProject (${stats.unique_bioproject_id})`, value: 50, itemStyle: { color: "#7fb3e0" } },
+                            ],
+                          },
+                          {
+                            name: t("home.statsDatasets"),
+                            itemStyle: { color: "#2b579a" },
+                            children: [
+                              { name: `DESEQ (${stats.unique_deseq_id})`, value: 100, itemStyle: { color: "#4a76b5" } },
+                            ],
+                          },
+                          {
+                            name: t("home.statsSamples"),
+                            itemStyle: { color: "#e8a735" },
+                            children: [
+                              { name: `SRR (${stats.unique_srr_id})`, value: 50, itemStyle: { color: "#f0c060" } },
+                              { name: `Records (${stats.record_rows})`, value: 50, itemStyle: { color: "#f5d590" } },
+                            ],
+                          },
+                          {
+                            name: t("home.statsChemicals"),
+                            itemStyle: { color: "#1d8348" },
+                            children: [
+                              { name: `${stats.unique_chemicals} Types`, value: 100, itemStyle: { color: "#28a760" } },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  }}
+                  style={{ height: isMobile ? 280 : 320 }}
+                  onEvents={{
+                    click: () => {
+                      navigate("/browse");
+                    },
+                  }}
+                />
+              )}
+            </div>
+          </Col>
+        </Row>
+      </div>
+
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: isMobile ? "0 12px" : "0 20px" }}>
         <Row gutter={isMobile ? [16, 16] : [40, 40]}>
           {/* 左侧：分析流程 */}
@@ -261,6 +383,7 @@ const Home: React.FC = () => {
           </div>
         )}
       </div>
+
     </div>
   );
 };
