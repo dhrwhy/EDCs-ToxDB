@@ -22,7 +22,7 @@ function App() {
       theme={{
         algorithm: theme.compactAlgorithm,
         token: {
-          colorPrimary: '#2b579a',
+          colorPrimary: '#1d3e70',
           colorLink: '#0033cc',
           fontFamily: 'Arial, Helvetica, sans-serif',
           fontSize: 14,
@@ -33,7 +33,7 @@ function App() {
         },
         components: {
           Layout: {
-            headerBg: '#2b579a',
+            headerBg: '#1d3e70',
             headerColor: '#ffffff',
             headerHeight: 64,
             headerPadding: '0 24px',

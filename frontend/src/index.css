@@ -67,7 +67,7 @@ a:hover {
 }
 
 .ant-layout-content {
-  padding: 16px !important;
+  padding: 0 !important;
 }
 
 /* Classic Tabs */
@@ -140,7 +140,7 @@ a:hover {
 /* ========== Mobile Responsive ========== */
 @media (max-width: 767px) {
   .ant-layout-content {
-    padding: 12px !important;
+    padding: 0 !important;
   }
 
   /* Descriptions: reduce padding on mobile */

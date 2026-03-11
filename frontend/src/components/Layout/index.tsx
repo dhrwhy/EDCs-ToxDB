@@ -120,7 +120,7 @@ const AppLayout: React.FC = () => {
               display: "flex",
               gap: 2,
               padding: "0 24px",
-              background: "#2b579a",
+              background: "#1d3e70",
               borderTop: "1px solid rgba(255,255,255,0.1)",
             }}
           >
@@ -139,7 +139,7 @@ const AppLayout: React.FC = () => {
                     fontSize: 16,
                     fontWeight: 500,
                     borderRadius: "4px 4px 0 0",
-                    color: active ? "#2b579a" : "rgba(255,255,255,0.9)",
+                    color: active ? "#1d3e70" : "rgba(255,255,255,0.9)",
                     background: active ? "#ffffff" : "transparent",
                     borderTop: active ? "3px solid #e8a735" : "3px solid transparent",
                     transition: "all 0.2s",
@@ -167,7 +167,7 @@ const AppLayout: React.FC = () => {
       {/* Mobile drawer navigation */}
       <Drawer
         title={
-          <span style={{ color: "#2b579a", fontWeight: "bold", fontSize: 18 }}>
+          <span style={{ color: "#1d3e70", fontWeight: "bold", fontSize: 18 }}>
             MouseToxDB
           </span>
         }
@@ -197,9 +197,9 @@ const AppLayout: React.FC = () => {
                   cursor: "pointer",
                   fontSize: 15,
                   fontWeight: active ? 600 : 400,
-                  color: active ? "#2b579a" : "#333",
-                  background: active ? "#e6edf5" : "transparent",
-                  borderLeft: active ? "3px solid #2b579a" : "3px solid transparent",
+                  color: active ? "#1d3e70" : "#333",
+                  background: active ? "#f4f6f9" : "transparent",
+                  borderLeft: active ? "3px solid #1d3e70" : "3px solid transparent",
                 }}
               >
                 {item.icon}
@@ -210,7 +210,7 @@ const AppLayout: React.FC = () => {
         </div>
       </Drawer>
 
-      <Content className="ant-layout-content" style={{ background: "#ffffff" }}>
+      <Content className="ant-layout-content" style={{ background: "#f4f6f9" }}>
         <div
           style={{
             maxWidth: 1600,

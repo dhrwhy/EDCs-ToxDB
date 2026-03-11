@@ -415,7 +415,7 @@ const Analysis: React.FC = () => {
   ];
 
   return (
-    <div>
+    <div style={{ padding: "24px" }}>
       {/* Breadcrumb */}
       <Breadcrumb
         style={{ marginBottom: 16 }}
@@ -426,99 +426,129 @@ const Analysis: React.FC = () => {
         ]}
       />
 
-      <Title level={4} style={{ marginBottom: 16, fontSize: window.innerWidth < 768 ? 16 : undefined, wordBreak: "break-word" }}>
+      <Title level={4} style={{ marginBottom: 20, fontSize: window.innerWidth < 768 ? 16 : undefined, wordBreak: "break-word" }}>
         {detail.deseq_id} — {summary.chemical_name}
       </Title>
 
       <Row gutter={24}>
         {/* Left sidebar navigation */}
-        <Col xs={0} md={5} lg={4}>
+        <Col xs={0} md={6} lg={5}>
           <div
             style={{
               position: "sticky",
-              top: 80,
-              background: "#fafafa",
-              borderRadius: 8,
-              padding: 16,
+              top: 140,
+              background: "#ffffff",
+              borderRadius: 4,
+              border: "1px solid #c8d9ed",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              overflow: "hidden",
+              maxHeight: "calc(100vh - 160px)",
+              display: "flex",
+              flexDirection: "column"
             }}
           >
-            <div style={{ marginBottom: 16 }}>
-              <Text strong style={{ fontSize: 18, color: "#1677ff" }}>
+            <div style={{ background: "#1d3e70", padding: "12px 16px", borderBottom: "2px solid #e8a735", flexShrink: 0 }}>
+              <Text strong style={{ fontSize: 16, color: "#ffffff" }}>
                 {detail.deseq_id}
               </Text>
             </div>
 
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-              <Button
-                onClick={() => setActiveKeys(allKeys)}
-                style={{ flex: 1, fontSize: 14 }}
-              >
-                {t("analysis.showAll")}
-              </Button>
-              <Button
-                onClick={() => setActiveKeys([])}
-                style={{ flex: 1, fontSize: 14 }}
-              >
-                {t("analysis.collapseAll")}
-              </Button>
-            </div>
+            <div style={{ padding: "16px", overflowY: "auto", flex: 1 }}>
+              <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+                <Button
+                  onClick={() => setActiveKeys(allKeys)}
+                  style={{ flex: 1, fontSize: 13 }}
+                  size="small"
+                >
+                  {t("analysis.showAll")}
+                </Button>
+                <Button
+                  onClick={() => setActiveKeys([])}
+                  style={{ flex: 1, fontSize: 13 }}
+                  size="small"
+                >
+                  {t("analysis.collapseAll")}
+                </Button>
+              </div>
 
-            <div
-              style={{
-                borderLeft: "2px solid #e8e8e8",
-              }}
-            >
-              {allKeys.map((key) => {
-                const isActive = activeKeys.includes(key);
-                return (
-                  <div
-                    key={key}
-                    onClick={() => scrollToSection(key)}
-                    style={{
-                      padding: "7px 12px",
-                      cursor: "pointer",
-                      fontSize: 13,
-                      lineHeight: 1.6,
-                      color: isActive ? "#1677ff" : "#666",
-                      fontWeight: isActive ? 500 : 400,
-                      marginLeft: -2,
-                      borderLeft: isActive
-                        ? "2px solid #1677ff"
-                        : "2px solid transparent",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.color = "#1677ff";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.color = "#666";
-                    }}
-                  >
-                    {sectionLabels[key]}
-                  </div>
-                );
-              })}
+              <div
+                style={{
+                  borderLeft: "2px solid #e8e8e8",
+                }}
+              >
+                {allKeys.map((key) => {
+                  const isActive = activeKeys.includes(key);
+                  return (
+                    <div
+                      key={key}
+                      onClick={() => scrollToSection(key)}
+                      style={{
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        fontSize: 13,
+                        lineHeight: 1.6,
+                        color: isActive ? "#1d3e70" : "#666",
+                        fontWeight: isActive ? "bold" : 400,
+                        marginLeft: -2,
+                        borderLeft: isActive
+                          ? "2px solid #e8a735"
+                          : "2px solid transparent",
+                        background: isActive ? "#f8f9fa" : "transparent",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) e.currentTarget.style.color = "#1d3e70";
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) e.currentTarget.style.color = "#666";
+                      }}
+                    >
+                      {sectionLabels[key]}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </Col>
 
         {/* Main content */}
-        <Col xs={24} md={19} lg={20}>
+        <Col xs={24} md={18} lg={19}>
           <div ref={collapseRef}>
             <Collapse
               activeKey={activeKeys}
               onChange={(keys) => setActiveKeys(keys as string[])}
-              items={collapseItems}
+              bordered={false}
+              items={collapseItems.map(item => ({
+                ...item,
+                style: {
+                  marginBottom: 16,
+                  background: "#ffffff",
+                  border: "1px solid #c8d9ed",
+                  borderRadius: 4,
+                  overflow: "hidden",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
+                }
+              }))}
               style={{ background: "transparent" }}
+              expandIcon={({ isActive }) => (
+                <div style={{ color: "#ffffff", fontSize: 12, marginTop: 4, transform: isActive ? "rotate(90deg)" : "rotate(0)", transition: "transform 0.2s" }}>
+                  ▶
+                </div>
+              )}
               styles={{
                 header: {
-                  background: "#f0f0f0",
-                  fontWeight: 600,
+                  background: "#1d3e70",
+                  color: "#ffffff",
+                  fontWeight: "bold",
                   fontSize: 15,
-                  borderRadius: 4,
+                  padding: "10px 16px",
+                  borderBottom: "2px solid #e8a735",
+                  alignItems: "center"
                 },
                 body: {
-                  padding: "16px 0",
+                  padding: "16px",
+                  background: "#ffffff"
                 },
               }}
             />

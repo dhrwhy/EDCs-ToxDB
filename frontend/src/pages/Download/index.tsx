@@ -10,11 +10,13 @@ const Download: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", paddingTop: 32 }}>
-      <Title level={3}>{t("download.title")}</Title>
-      <Card>
+    <div style={{ padding: "24px", maxWidth: 800, margin: "0 auto" }}>
+      <Title level={4} style={{ color: "#1d3e70", borderBottom: "2px solid #e8a735", paddingBottom: 8, marginBottom: 24 }}>
+        {t("download.title")}
+      </Title>
+      <Card style={{ border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", borderRadius: 4 }}>
         <div style={{ textAlign: "center", padding: "24px 0" }}>
-          <DatabaseOutlined style={{ fontSize: 48, color: "#1677ff", marginBottom: 16 }} />
+          <DatabaseOutlined style={{ fontSize: 48, color: "#1d3e70", marginBottom: 16 }} />
           <Title level={4}>{t("download.fullDb")}</Title>
           <Paragraph type="secondary">
             {t("download.fullDbDesc")}

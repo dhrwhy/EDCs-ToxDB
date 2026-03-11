@@ -8,7 +8,6 @@ import {
   Spin,
   Divider,
   InputNumber,
-  Button,
   Collapse,
 } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
@@ -151,22 +150,22 @@ const Browse: React.FC = () => {
   );
 
   return (
-    <div>
+    <div style={{ padding: isMobile ? "16px" : "24px" }}>
       {/* Mobile: collapsible filter */}
       {isMobile && (
-        <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 16 }}>
           <Collapse
             activeKey={mobileFilterOpen ? ["filter"] : []}
             onChange={(keys) => setMobileFilterOpen(keys.includes("filter"))}
             items={[{
               key: "filter",
               label: (
-                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: "bold" }}>
                   <FilterOutlined />
                   {t("browse.filters")}
                   {activeFilterCount > 0 && (
                     <span style={{
-                      background: "#2b579a",
+                      background: "#e8a735",
                       color: "#fff",
                       borderRadius: 10,
                       padding: "0 8px",
@@ -180,29 +179,35 @@ const Browse: React.FC = () => {
               ),
               children: filterContent,
             }]}
+            style={{ background: "#fff", border: "1px solid #c8d9ed" }}
           />
         </div>
       )}
 
-      <Row gutter={24}>
+      <Row gutter={isMobile ? 16 : 24}>
         {/* Desktop: sidebar filter panel */}
         {!isMobile && (
-          <Col md={5}>
+          <Col md={6} lg={5}>
             <div
               style={{
                 background: "#ffffff",
-                border: "1px solid #cccccc",
+                border: "1px solid #c8d9ed",
                 borderRadius: 4,
                 position: "sticky",
-                top: 100,
+                top: 140,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                maxHeight: "calc(100vh - 160px)",
+                display: "flex",
+                flexDirection: "column"
               }}
             >
-              <div style={{ background: "#e6edf5", padding: "12px 16px", borderBottom: "1px solid #cccccc", borderRadius: "4px 4px 0 0" }}>
-                <Title level={5} style={{ fontSize: 16, margin: 0, color: "#1d3e70" }}>
+              <div style={{ background: "#1d3e70", padding: "12px 16px", borderBottom: "2px solid #e8a735", borderRadius: "4px 4px 0 0", display: "flex", alignItems: "center", flexShrink: 0 }}>
+                <FilterOutlined style={{ color: "#fff", marginRight: 8 }} />
+                <Title level={5} style={{ fontSize: 15, margin: 0, color: "#ffffff" }}>
                   {t("browse.filters")}
                 </Title>
               </div>
-              <div style={{ padding: "16px" }}>
+              <div style={{ padding: "16px", overflowY: "auto", flex: 1 }}>
                 {filterContent}
               </div>
             </div>
@@ -210,17 +215,19 @@ const Browse: React.FC = () => {
         )}
 
         {/* 数据表格 */}
-        <Col xs={24} md={19}>
-          <Spin spinning={loading}>
-            <AnalysisTable
-              items={items}
-              total={total}
-              page={page}
-              pageSize={30}
-              loading={loading}
-              onPageChange={setPage}
-            />
-          </Spin>
+        <Col xs={24} md={18} lg={19}>
+          <div style={{ background: "#fff", padding: isMobile ? 12 : 20, borderRadius: 4, border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+            <Spin spinning={loading}>
+              <AnalysisTable
+                items={items}
+                total={total}
+                page={page}
+                pageSize={30}
+                loading={loading}
+                onPageChange={setPage}
+              />
+            </Spin>
+          </div>
         </Col>
       </Row>
     </div>

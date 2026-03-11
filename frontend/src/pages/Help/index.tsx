@@ -27,11 +27,13 @@ const Help: React.FC = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto" }}>
-      <Title level={3}>{t("help.title")}</Title>
+    <div style={{ padding: "24px", maxWidth: 1000, margin: "0 auto" }}>
+      <Title level={4} style={{ color: "#1d3e70", borderBottom: "2px solid #e8a735", paddingBottom: 8, marginBottom: 24 }}>
+        {t("help.title")}
+      </Title>
 
-      <Card style={{ marginBottom: 24 }}>
-        <Title level={4}>{t("help.usageGuide")}</Title>
+      <Card style={{ marginBottom: 24, border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", borderRadius: 4 }}>
+        <Title level={5} style={{ color: "#1d3e70" }}>{t("help.usageGuide")}</Title>
         <Paragraph>{t("help.usageIntro")}</Paragraph>
         <Paragraph>
           <Text strong>{t("help.searchLabel")}</Text>
@@ -51,8 +53,8 @@ const Help: React.FC = () => {
         </Paragraph>
       </Card>
 
-      <Card style={{ marginBottom: 24 }}>
-        <Title level={4}>{t("help.fieldTitle")}</Title>
+      <Card style={{ marginBottom: 24, border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", borderRadius: 4 }}>
+        <Title level={5} style={{ color: "#1d3e70" }}>{t("help.fieldTitle")}</Title>
         <Table
           columns={helpColumns}
           dataSource={fieldData}
@@ -63,8 +65,8 @@ const Help: React.FC = () => {
         />
       </Card>
 
-      <Card style={{ marginBottom: 24 }}>
-        <Title level={4}>{t("help.externalLinksTitle")}</Title>
+      <Card style={{ marginBottom: 24, border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", borderRadius: 4 }}>
+        <Title level={5} style={{ color: "#1d3e70" }}>{t("help.externalLinksTitle")}</Title>
         <Paragraph>{t("help.externalLinksIntro")}</Paragraph>
         <ul>
           <li>
@@ -85,13 +87,13 @@ const Help: React.FC = () => {
         </ul>
       </Card>
 
-      <Card style={{ marginBottom: 24 }}>
-        <Title level={4}>{t("help.contactTitle")}</Title>
+      <Card style={{ marginBottom: 24, border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", borderRadius: 4 }}>
+        <Title level={5} style={{ color: "#1d3e70" }}>{t("help.contactTitle")}</Title>
         <Paragraph>{t("help.contactDesc")}</Paragraph>
       </Card>
 
-      <Card>
-        <Title level={4}>{t("help.citationTitle")}</Title>
+      <Card style={{ border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", borderRadius: 4 }}>
+        <Title level={5} style={{ color: "#1d3e70" }}>{t("help.citationTitle")}</Title>
         <Paragraph>{t("help.citationDesc")}</Paragraph>
       </Card>
     </div>

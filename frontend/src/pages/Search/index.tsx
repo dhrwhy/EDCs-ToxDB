@@ -54,55 +54,55 @@ const Search: React.FC = () => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 24 }}>
-        <SearchBox
-          onSearch={handleSearch}
-          defaultKeyword={keyword}
-          defaultCategory={category}
-        />
+    <div style={{ padding: "24px" }}>
+      <div style={{ marginBottom: 24, maxWidth: 900, margin: "0 auto 24px" }}>
+        <div style={{ background: "#ffffff", padding: "10px", borderRadius: "6px", border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+          <SearchBox
+            onSearch={handleSearch}
+            defaultKeyword={keyword}
+            defaultCategory={category}
+          />
+        </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <Space>
-          <Title level={5} style={{ margin: 0 }}>
-            {t("search.results")}
-          </Title>
+      <div style={{ background: "#fff", border: "1px solid #c8d9ed", borderRadius: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <div style={{ background: "#1d3e70", padding: "12px 20px", borderBottom: "2px solid #e8a735", borderRadius: "4px 4px 0 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Space>
+            <Title level={5} style={{ margin: 0, color: "#fff" }}>
+              {t("search.results")}
+            </Title>
+            {total > 0 && (
+              <Text style={{ color: "#e0e8f5", fontSize: 13 }}>
+                {t("search.found", { count: total })}
+              </Text>
+            )}
+          </Space>
           {total > 0 && (
-            <Text type="secondary">
-              {t("search.found", { count: total })}
-            </Text>
+            <Button
+              size="small"
+              icon={<DownloadOutlined />}
+              onClick={() => exportSearchResults(keyword, category)}
+            >
+              {t("search.exportResults")}
+            </Button>
           )}
-        </Space>
-        {total > 0 && (
-          <Button
-            icon={<DownloadOutlined />}
-            onClick={() => exportSearchResults(keyword, category)}
-          >
-            {t("search.exportResults")}
-          </Button>
-        )}
-      </div>
+        </div>
 
-      {!loading && total === 0 && keyword ? (
-        <Empty description={t("search.noResults")} />
-      ) : (
-        <AnalysisTable
-          items={items}
-          total={total}
-          page={page}
-          pageSize={30}
-          loading={loading}
-          onPageChange={handlePageChange}
-        />
-      )}
+        <div style={{ padding: "20px" }}>
+          {!loading && total === 0 && keyword ? (
+            <Empty description={t("search.noResults")} />
+          ) : (
+            <AnalysisTable
+              items={items}
+              total={total}
+              page={page}
+              pageSize={30}
+              loading={loading}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

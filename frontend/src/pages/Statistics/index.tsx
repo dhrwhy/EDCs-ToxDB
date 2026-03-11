@@ -22,8 +22,10 @@ const Statistics: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <Title level={3}>{t("statistics.title")}</Title>
+    <div style={{ padding: "24px", maxWidth: 1400, margin: "0 auto" }}>
+      <Title level={4} style={{ color: "#1d3e70", borderBottom: "2px solid #e8a735", paddingBottom: 8, marginBottom: 24 }}>
+        {t("statistics.title")}
+      </Title>
       <Spin spinning={loading}>
         {assets.length === 0 && !loading ? (
           <Empty description={t("statistics.noCharts")} />
@@ -31,7 +33,11 @@ const Statistics: React.FC = () => {
           <Row gutter={[24, 24]}>
             {assets.map((asset) => (
               <Col xs={24} md={12} key={asset.name}>
-                <Card title={asset.title}>
+                <Card 
+                  title={<span style={{ color: "#1d3e70", fontSize: 16 }}>{asset.title}</span>}
+                  headStyle={{ background: "#f8f9fa", borderBottom: "1px solid #e6edf5" }}
+                  style={{ border: "1px solid #c8d9ed", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", borderRadius: 4 }}
+                >
                   <img
                     src={asset.url}
                     alt={asset.title}
