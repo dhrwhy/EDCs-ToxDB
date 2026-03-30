@@ -28,6 +28,10 @@ class AnalysisSummary(BaseModel):
     publication_month: Optional[int] = None
     reference_title: Optional[str] = None
     doi: Optional[str] = None
+    summary_text: Optional[str] = None
+    strain: Optional[str] = None
+    in_vivo_vitro: Optional[str] = None
+    gender: Optional[str] = None
     class1_code: str
     class2_code: str
     class3_name: Optional[str] = None

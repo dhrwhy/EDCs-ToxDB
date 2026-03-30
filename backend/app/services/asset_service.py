@@ -10,7 +10,11 @@ def get_asset_file_path(db: Session, asset_id: int) -> tuple[dict | None, str | 
     if not asset:
         return None, None
 
-    full_path = str(Path(settings.ASSETS_DIR) / asset.file_path)
+    base = Path(settings.ASSETS_DIR).resolve()
+    full_path = (base / asset.file_path).resolve()
+    if not str(full_path).startswith(str(base) + "/"):
+        return None, None
+    full_path = str(full_path)
     asset_info = {
         "asset_id": asset.asset_id,
         "file_name": asset.file_name,

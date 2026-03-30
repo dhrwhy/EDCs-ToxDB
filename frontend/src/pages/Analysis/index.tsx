@@ -12,7 +12,7 @@ import {
   Row,
   Col,
 } from "antd";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, RightOutlined } from "@ant-design/icons";
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAnalysisDetail } from "../../api/analysis";
@@ -23,19 +23,47 @@ import ExternalLink from "../../components/ExternalLink";
 import PdfCard from "../../components/PdfCard";
 import DegTable from "../../components/DegTable";
 import type { AnalysisDetail, AssetItem } from "../../types";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const { Title, Text } = Typography;
 
-const allKeys = ["basic", "sequencing", "tissue", "literature", "mesh", "samples", "charts", "deg"];
+const allKeys = ["toxicant", "experiment", "differential", "enrichment", "expression"];
 
 const Analysis: React.FC = () => {
   const { analysisKey } = useParams<{ analysisKey: string }>();
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const [detail, setDetail] = useState<AnalysisDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [activeKeys, setActiveKeys] = useState<string[]>(allKeys);
   const collapseRef = useRef<HTMLDivElement>(null);
+  const [currentSection, setCurrentSection] = useState<string>(allKeys[0]);
+
+  // Intersection Observer to track the currently visible section
+  useEffect(() => {
+    const sectionEls = allKeys
+      .map((key) => document.getElementById(`section-${key}`))
+      .filter(Boolean) as HTMLElement[];
+    if (sectionEls.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the topmost visible section
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          const id = visible[0].target.id.replace("section-", "");
+          setCurrentSection(id);
+        }
+      },
+      { rootMargin: "-120px 0px -60% 0px", threshold: 0 }
+    );
+
+    sectionEls.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [detail, activeKeys]);
 
   useEffect(() => {
     if (!analysisKey) return;
@@ -62,11 +90,6 @@ const Analysis: React.FC = () => {
 
   const plotDf = assets.find((a) => a.asset_category === "plot_df");
 
-  const standaloneCategories = ["pca_plot", "volcano_plot", "heatmap"];
-  const standaloneAssets = standaloneCategories
-    .map((cat) => assets.find((a) => a.asset_category === cat))
-    .filter(Boolean) as AssetItem[];
-
   const enrichmentCategories = [
     { key: "kegg_up_plot", label: t("analysis.keggUp") },
     { key: "kegg_down_plot", label: t("analysis.keggDown") },
@@ -82,27 +105,39 @@ const Analysis: React.FC = () => {
     })
     .filter(Boolean) as { key: string; label: string; asset: AssetItem }[];
 
+  const pcaAsset = assets.find((a) => a.asset_category === "pca_plot");
+  const volcanoAsset = assets.find((a) => a.asset_category === "volcano_plot");
+  const heatmapAsset = assets.find((a) => a.asset_category === "heatmap");
+
   const renderLink = (
     val: string | null,
     builder: (v: string) => string
   ) => {
-    if (!val) return "—";
+    if (!val) return "\u2014";
     return <ExternalLink href={builder(val)}>{val}</ExternalLink>;
   };
 
+  // Build MESH chain: infer_Class -> Class7 -> ... -> Class1, skip NULL, arrow style
+  const meshChain = [
+    summary.inferred_class,
+    summary.class7_name,
+    summary.class6_name,
+    summary.class5_name,
+    summary.class4_name,
+    summary.class3_name,
+    summary.class2_code,
+    summary.class1_code,
+  ].filter(Boolean) as string[];
+
   const sectionLabels: Record<string, string> = {
-    basic: t("analysis.basicInfo"),
-    sequencing: t("analysis.sequencingInfo"),
-    tissue: t("analysis.tissueClassification"),
-    literature: t("analysis.literatureInfo"),
-    mesh: t("analysis.meshClassification"),
-    samples: t("analysis.sampleRecords"),
-    charts: t("analysis.chartResources"),
-    deg: t("analysis.degTable"),
+    toxicant: t("analysis.toxicantInfo"),
+    experiment: t("analysis.experiment"),
+    differential: t("analysis.differential"),
+    enrichment: t("analysis.enrichment"),
+    expression: t("analysis.expression"),
   };
 
   const scrollToSection = (key: string) => {
-    // Ensure section is expanded first
     if (!activeKeys.includes(key)) {
       setActiveKeys((prev) => [...prev, key]);
     }
@@ -116,19 +151,20 @@ const Analysis: React.FC = () => {
 
   const collapseItems = [
     {
-      key: "basic",
-      label: sectionLabels.basic,
+      key: "toxicant",
+      label: sectionLabels.toxicant,
       children: (
-        <div id="section-basic">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
+        <div id="section-toxicant">
+          {/* Sub-panel A: Basic toxicant info */}
+          <Title level={5} style={{ color: '#1d3e70', marginBottom: 12, marginTop: 0 }}>
+            {t("analysis.basicInfo")}
+          </Title>
+          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }} style={{ marginBottom: 20 }}>
             <Descriptions.Item label={t("analysis.chemicalName")}>
               {summary.chemical_name}
             </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.casId")}>
-              {summary.cas_id}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.inchiKey")}>
-              {summary.inchi_key}
+            <Descriptions.Item label={t("analysis.alternativeNames")}>
+              {displayValue(summary.alternative_names)}
             </Descriptions.Item>
             <Descriptions.Item label={t("analysis.pubchemCid")}>
               {renderLink(summary.pubchem_cid, externalLinks.pubchem)}
@@ -136,159 +172,82 @@ const Analysis: React.FC = () => {
             <Descriptions.Item label={t("analysis.pubchemName")}>
               {summary.pubchem_name}
             </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.deseqId")}>
-              {detail.deseq_id}
+            <Descriptions.Item label={t("analysis.casId")}>
+              {summary.cas_id}
             </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.dataSource")}>
+            <Descriptions.Item label={t("analysis.inchiKey")}>
+              {summary.inchi_key}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.fromGroup")}>
               {summary.from_group}
             </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.evidenceLevel")}>
-              {summary.evidence}
-            </Descriptions.Item>
           </Descriptions>
+
+          {/* Sub-panel B: MESH Classification chain */}
+          <Title level={5} style={{ color: '#1d3e70', marginBottom: 12 }}>
+            {t("analysis.classificationInfo")}
+          </Title>
+          {meshChain.length > 0 ? (
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 8,
+              padding: "12px 16px",
+              background: "#f8f9fa",
+              borderRadius: 4,
+              border: "1px solid #e6edf5",
+            }}>
+              {meshChain.map((item, i) => (
+                <React.Fragment key={i}>
+                  <span style={{
+                    padding: "4px 12px",
+                    background: i === 0 ? "#1d3e70" : "#e6edf5",
+                    color: i === 0 ? "#fff" : "#333",
+                    borderRadius: 4,
+                    fontSize: 14,
+                    fontWeight: i === 0 ? "bold" : "normal",
+                  }}>
+                    {item}
+                  </span>
+                  {i < meshChain.length - 1 && (
+                    <RightOutlined style={{ color: "#999", fontSize: 12 }} />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          ) : (
+            <Text type="secondary">{"\u2014"}</Text>
+          )}
         </div>
       ),
     },
     {
-      key: "sequencing",
-      label: sectionLabels.sequencing,
+      key: "experiment",
+      label: sectionLabels.experiment,
       children: (
-        <div id="section-sequencing">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
-            <Descriptions.Item label={t("analysis.gseId")}>
-              {renderLink(summary.gse_id, externalLinks.geo)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.bioproject")}>
-              {renderLink(summary.bioproject_id, externalLinks.bioproject)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.organism")}>
-              {summary.organism}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.platform")}>
-              {summary.platform}
-            </Descriptions.Item>
-          </Descriptions>
-        </div>
-      ),
-    },
-    {
-      key: "tissue",
-      label: sectionLabels.tissue,
-      children: (
-        <div id="section-tissue">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
-            <Descriptions.Item label={t("analysis.tissueCategory")}>
-              {summary.tissue_category}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.tissueSubcategory")}>
-              {displayValue(summary.tissue_subcategory)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.reproductiveSubcategory")}>
-              {displayValue(summary.reproductive_subcategory)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.tissueCellLine")}>
-              {summary.tissue_or_cell_line}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.exposureToxicant")}>
-              {displayValue(summary.exposure_toxicant)}
-            </Descriptions.Item>
-          </Descriptions>
-        </div>
-      ),
-    },
-    {
-      key: "literature",
-      label: sectionLabels.literature,
-      children: (
-        <div id="section-literature">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
-            <Descriptions.Item label={t("analysis.libraryMethod")}>
-              {displayValue(summary.library_method)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.libraryMethodDetail")}>
-              {displayValue(summary.library_method_detail)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.publicationYear")}>
-              {displayValue(summary.publication_year)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.publicationMonth")}>
-              {displayValue(summary.publication_month)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.reference")} span={2}>
-              {displayValue(summary.reference_title)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.doi")} span={3}>
-              {renderLink(summary.doi, externalLinks.doi)}
-            </Descriptions.Item>
-          </Descriptions>
-        </div>
-      ),
-    },
-    {
-      key: "mesh",
-      label: sectionLabels.mesh,
-      children: (
-        <div id="section-mesh">
-          <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
-            <Descriptions.Item label="Class1">
-              {displayValue(summary.class1_code)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Class2">
-              {displayValue(summary.class2_code)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Class3">
-              {displayValue(summary.class3_name)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Class4">
-              {displayValue(summary.class4_name)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Class5">
-              {displayValue(summary.class5_name)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Class6">
-              {displayValue(summary.class6_name)}
-            </Descriptions.Item>
-            <Descriptions.Item label="Class7">
-              {displayValue(summary.class7_name)}
-            </Descriptions.Item>
-            <Descriptions.Item label={t("analysis.inferredClass")}>
-              {displayValue(summary.inferred_class)}
-            </Descriptions.Item>
-          </Descriptions>
-        </div>
-      ),
-    },
-    {
-      key: "samples",
-      label: sectionLabels.samples,
-      children: (
-        <div id="section-samples">
+        <div id="section-experiment">
+          {/* Sub-panel A: Sample table */}
+          <Title level={5} style={{ color: '#1d3e70', marginBottom: 12, marginTop: 0 }}>
+            {t("analysis.sampleTable")}
+          </Title>
           <Table
             rowKey="srr_id"
             dataSource={sample_records}
             bordered
+            size="small"
             pagination={
               sample_records.length > 30
                 ? { pageSize: 30, showTotal: (total: number) => t("common.total", { count: total }) }
                 : false
             }
             scroll={{ x: "max-content" }}
+            style={{ marginBottom: 20 }}
             columns={[
-              {
-                title: t("analysis.srrId"),
-                dataIndex: "srr_id",
-                render: (v: string) => (
-                  <ExternalLink href={externalLinks.sra(v)}>{v}</ExternalLink>
-                ),
-              },
-              {
-                title: t("analysis.treatment"),
-                dataIndex: "treatment",
-                render: (v: string | null) => displayValue(v),
-              },
               {
                 title: t("analysis.experimentGroup"),
                 dataIndex: "experiment_group",
+                width: 100,
               },
               {
                 title: t("analysis.chemAbbr"),
@@ -305,110 +264,207 @@ const Analysis: React.FC = () => {
                 dataIndex: "exposure_time",
                 render: (v: string | null) => displayValue(v),
               },
-              { title: "AvgSpotLen", dataIndex: "avg_spot_len" },
-              {
-                title: t("analysis.cellType"),
-                dataIndex: "cell_type",
-                render: (v: string | null) => displayValue(v),
-              },
-              { title: t("analysis.libraryLayout"), dataIndex: "library_layout" },
             ]}
           />
-        </div>
-      ),
-    },
-    {
-      key: "charts",
-      label: sectionLabels.charts,
-      children: (
-        <div id="section-charts">
-          {assets.length === 0 ? (
-            <Empty description={t("analysis.noResources")} />
-          ) : (
+
+          {/* Sub-panel B: Experiment metadata */}
+          <Title level={5} style={{ color: '#1d3e70', marginBottom: 12 }}>
+            {t("analysis.organism")} / {t("analysis.strain")}
+          </Title>
+          <Descriptions bordered column={{ xs: 1, sm: 3 }} style={{ marginBottom: 20 }}>
+            <Descriptions.Item label={t("analysis.organism")}>
+              {displayValue(summary.organism)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.strain")}>
+              {displayValue(summary.strain)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.inVivoVitro")}>
+              {displayValue(summary.in_vivo_vitro)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.gender")}>
+              {displayValue(summary.gender)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.tissueCategory")}>
+              {displayValue(summary.tissue_category)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.tissueCellLine")}>
+              {displayValue(summary.tissue_or_cell_line)}
+            </Descriptions.Item>
+          </Descriptions>
+
+          {/* Sub-panel C: Literature info */}
+          <Title level={5} style={{ color: '#1d3e70', marginBottom: 12 }}>
+            {t("analysis.literatureInfo")}
+          </Title>
+          <Descriptions bordered column={{ xs: 1, sm: 2 }} style={{ marginBottom: 20 }}>
+            <Descriptions.Item label={t("analysis.reference")} span={2}>
+              {displayValue(summary.reference_title)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.publicationYear")}>
+              {displayValue(summary.publication_year)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.publicationMonth")}>
+              {displayValue(summary.publication_month)}
+            </Descriptions.Item>
+            <Descriptions.Item label={t("analysis.doi")} span={2}>
+              {renderLink(summary.doi, externalLinks.doi)}
+            </Descriptions.Item>
+          </Descriptions>
+
+          {/* Sub-panel C: Summary (only if has value) */}
+          {summary.summary_text && (
             <>
-              {standaloneAssets.map((asset) => (
-                <div key={asset.asset_id} style={{ marginBottom: 24 }}>
-                  <PdfCard asset={asset} />
-                </div>
-              ))}
+              <Title level={5} style={{ color: '#1d3e70', marginBottom: 12 }}>
+                {t("analysis.summaryText")}
+              </Title>
+              <div style={{
+                padding: "16px",
+                background: "#f8f9fa",
+                borderRadius: 4,
+                border: "1px solid #e6edf5",
+                lineHeight: 1.8,
+                fontSize: 14,
+                marginBottom: 20,
+                whiteSpace: "pre-wrap",
+              }}>
+                {summary.summary_text}
+              </div>
+            </>
+          )}
 
-              {enrichmentAssets.length > 0 && (
-                <div
-                  style={{
-                    marginBottom: 24,
-                    background: "#fff",
-                    border: "1px solid #f0f0f0",
-                    borderRadius: 8,
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "16px 24px 0",
-                      borderBottom: "1px solid #f0f0f0",
-                      background: "#fafafa",
-                      borderRadius: "8px 8px 0 0",
-                    }}
-                  >
-                    <Title level={5} style={{ margin: 0, paddingBottom: 12 }}>
-                      {t("analysis.enrichmentAnalysis")}
-                    </Title>
-                  </div>
-                  <div style={{ padding: "0 24px 24px" }}>
-                    <Tabs
-                      items={enrichmentAssets.map((item) => ({
-                        key: item.key,
-                        label: item.label,
-                        children: (
-                          <div style={{ textAlign: "center" }}>
-                            <img
-                              src={item.asset.preview_url}
-                              alt={item.asset.display_name}
-                              style={{
-                                maxWidth: "100%",
-                                maxHeight: 600,
-                                objectFit: "contain",
-                              }}
-                            />
-                            <div style={{ marginTop: 12 }}>
-                              <Button
-                                type="link"
-                                icon={<DownloadOutlined />}
-                                onClick={() =>
-                                  downloadAsset(item.asset.asset_id)
-                                }
-                              >
-                                {t("common.download")}
-                              </Button>
-                            </div>
-                          </div>
-                        ),
-                      }))}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {plotDf && (
-                <div style={{ marginTop: 16 }}>
-                  <Button
-                    icon={<DownloadOutlined />}
-                    onClick={() => downloadAsset(plotDf.asset_id)}
-                  >
-                    {t("analysis.downloadPlotDf")}
-                  </Button>
-                </div>
-              )}
+          {/* Sub-panel D: PCA plot */}
+          {pcaAsset && (
+            <>
+              <Title level={5} style={{ color: '#1d3e70', marginBottom: 12 }}>
+                {t("analysis.pcaPlot")}
+              </Title>
+              <PdfCard asset={pcaAsset} />
             </>
           )}
         </div>
       ),
     },
     {
-      key: "deg",
-      label: sectionLabels.deg,
+      key: "differential",
+      label: sectionLabels.differential,
       children: (
-        <div id="section-deg">
+        <div id="section-differential">
+          {/* Volcano plot */}
+          {volcanoAsset && (
+            <div style={{ marginBottom: 24 }}>
+              <Title level={5} style={{ color: '#1d3e70', marginBottom: 12, marginTop: 0 }}>
+                {t("analysis.volcanoPlot")}
+              </Title>
+              <PdfCard asset={volcanoAsset} />
+            </div>
+          )}
+
+          {/* DEG Table */}
+          <Title level={5} style={{ color: '#1d3e70', marginBottom: 12 }}>
+            {t("analysis.degTable")}
+          </Title>
           <DegTable analysisKey={analysisKey!} assets={assets} />
+        </div>
+      ),
+    },
+    {
+      key: "enrichment",
+      label: sectionLabels.enrichment,
+      children: (
+        <div id="section-enrichment">
+          {/* Heatmap */}
+          {heatmapAsset && (
+            <div style={{ marginBottom: 24 }}>
+              <Title level={5} style={{ color: '#1d3e70', marginBottom: 12, marginTop: 0 }}>
+                {t("analysis.heatmap")}
+              </Title>
+              <PdfCard asset={heatmapAsset} />
+            </div>
+          )}
+
+          {/* Enrichment pathway tabs */}
+          {enrichmentAssets.length > 0 && (
+            <div
+              style={{
+                marginBottom: 24,
+                background: "#fff",
+                border: "1px solid #f0f0f0",
+                borderRadius: 8,
+              }}
+            >
+              <div
+                style={{
+                  padding: "16px 24px 0",
+                  borderBottom: "1px solid #f0f0f0",
+                  background: "#fafafa",
+                  borderRadius: "8px 8px 0 0",
+                }}
+              >
+                <Title level={5} style={{ margin: 0, paddingBottom: 12 }}>
+                  {t("analysis.enrichmentAnalysis")}
+                </Title>
+              </div>
+              <div style={{ padding: "0 24px 24px" }}>
+                <Tabs
+                  items={enrichmentAssets.map((item) => ({
+                    key: item.key,
+                    label: item.label,
+                    children: (
+                      <div style={{ textAlign: "center" }}>
+                        <img
+                          src={item.asset.preview_url}
+                          alt={item.asset.display_name}
+                          style={{
+                            maxWidth: "100%",
+                            maxHeight: 600,
+                            objectFit: "contain",
+                          }}
+                        />
+                        <div style={{ marginTop: 12 }}>
+                          <Button
+                            type="link"
+                            icon={<DownloadOutlined />}
+                            onClick={() =>
+                              downloadAsset(item.asset.asset_id)
+                            }
+                          >
+                            {t("common.download")}
+                          </Button>
+                        </div>
+                      </div>
+                    ),
+                  }))}
+                />
+              </div>
+            </div>
+          )}
+
+          {plotDf && (
+            <div style={{ marginTop: 16 }}>
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={() => downloadAsset(plotDf.asset_id)}
+              >
+                {t("analysis.downloadPlotDf")}
+              </Button>
+            </div>
+          )}
+
+          {!heatmapAsset && enrichmentAssets.length === 0 && (
+            <Empty description={t("analysis.noResources")} />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "expression",
+      label: sectionLabels.expression,
+      children: (
+        <div id="section-expression">
+          <Empty
+            description={t("analysis.expressionComingSoon")}
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          />
         </div>
       ),
     },
@@ -426,7 +482,7 @@ const Analysis: React.FC = () => {
         ]}
       />
 
-      <Title level={4} style={{ marginBottom: 20, fontSize: window.innerWidth < 768 ? 16 : undefined, wordBreak: "break-word" }}>
+      <Title level={4} style={{ marginBottom: 20, fontSize: isMobile ? 16 : undefined, wordBreak: "break-word" }}>
         {detail.deseq_id} — {summary.chemical_name}
       </Title>
 
@@ -477,30 +533,30 @@ const Analysis: React.FC = () => {
                 }}
               >
                 {allKeys.map((key) => {
-                  const isActive = activeKeys.includes(key);
+                  const isCurrent = currentSection === key;
                   return (
                     <div
                       key={key}
                       onClick={() => scrollToSection(key)}
                       style={{
-                        padding: "6px 12px",
+                        padding: "8px 12px",
                         cursor: "pointer",
-                        fontSize: 13,
+                        fontSize: 14,
                         lineHeight: 1.6,
-                        color: isActive ? "#1d3e70" : "#666",
-                        fontWeight: isActive ? "bold" : 400,
+                        color: isCurrent ? "#1d3e70" : "#666",
+                        fontWeight: isCurrent ? "bold" : 400,
                         marginLeft: -2,
-                        borderLeft: isActive
+                        borderLeft: isCurrent
                           ? "2px solid #e8a735"
                           : "2px solid transparent",
-                        background: isActive ? "#f8f9fa" : "transparent",
+                        background: isCurrent ? "#f8f9fa" : "transparent",
                         transition: "all 0.2s",
                       }}
                       onMouseEnter={(e) => {
-                        if (!isActive) e.currentTarget.style.color = "#1d3e70";
+                        if (!isCurrent) e.currentTarget.style.color = "#1d3e70";
                       }}
                       onMouseLeave={(e) => {
-                        if (!isActive) e.currentTarget.style.color = "#666";
+                        if (!isCurrent) e.currentTarget.style.color = "#666";
                       }}
                     >
                       {sectionLabels[key]}
@@ -516,6 +572,7 @@ const Analysis: React.FC = () => {
         <Col xs={24} md={18} lg={19}>
           <div ref={collapseRef}>
             <Collapse
+              className="analysis-collapse"
               activeKey={activeKeys}
               onChange={(keys) => setActiveKeys(keys as string[])}
               bordered={false}
@@ -526,14 +583,13 @@ const Analysis: React.FC = () => {
                   background: "#ffffff",
                   border: "1px solid #c8d9ed",
                   borderRadius: 4,
-                  overflow: "hidden",
                   boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
                 }
               }))}
               style={{ background: "transparent" }}
               expandIcon={({ isActive }) => (
                 <div style={{ color: "#ffffff", fontSize: 12, marginTop: 4, transform: isActive ? "rotate(90deg)" : "rotate(0)", transition: "transform 0.2s" }}>
-                  ▶
+                  {"\u25B6"}
                 </div>
               )}
               styles={{
@@ -544,7 +600,8 @@ const Analysis: React.FC = () => {
                   fontSize: 15,
                   padding: "10px 16px",
                   borderBottom: "2px solid #e8a735",
-                  alignItems: "center"
+                  alignItems: "center",
+                  borderRadius: 0,
                 },
                 body: {
                   padding: "16px",

@@ -1,6 +1,6 @@
-# MouseToxDB -- 小鼠毒理转录组数据库
+# EDC-ToxDB — Endocrine Disrupting Chemicals Toxicogenomics Database
 
-MouseToxDB 是一个公开访问、只读型的科研数据库检索与展示网站。系统整合了小鼠（*Mus musculus*）暴露于多种化学毒物后的转录组 DESeq2 差异分析数据，面向公开用户提供检索、浏览和下载服务。
+EDC-ToxDB 是一个公开访问、只读型的科研数据库检索与展示网站。系统整合了小鼠（*Mus musculus*）及人类（*Homo sapiens*）暴露于多种内分泌干扰化学物（EDCs）后的转录组 DESeq2 差异分析数据，面向公开用户提供检索、浏览和下载服务。
 
 ---
 
@@ -35,7 +35,7 @@ SDNU/
 │   │   │   ├── search.ts              #   搜索 API
 │   │   │   ├── browse.ts              #   浏览 & 筛选 API
 │   │   │   ├── analysis.ts            #   分析详情 & DEG 表格 API
-│   │   │   ├── stats.ts               #   统计摘要 API
+│   │   │   ├── stats.ts               #   统计摘要 API（含发表年份、器官分布、MESH 树）
 │   │   │   └── download.ts            #   下载/导出（浏览器直接下载）
 │   │   ├── components/                # 可复用 UI 组件
 │   │   │   ├── Layout/index.tsx       #   全局布局（双层导航栏 + 页脚 + 移动端汉堡菜单）
@@ -43,18 +43,22 @@ SDNU/
 │   │   │   ├── AnalysisTable/index.tsx#   分析条目分页表格
 │   │   │   ├── DegTable/index.tsx     #   DEG 差异基因分页表格
 │   │   │   ├── PdfCard/index.tsx      #   PDF 预览卡片（PDF→PNG 渲染 + 下载）
+│   │   │   ├── BodyMap/               #   Body Map 组件
+│   │   │   │   ├── index.ts           #     统一导出
+│   │   │   │   ├── MouseBodyMap.tsx   #     小鼠器官可点击 Body Map
+│   │   │   │   └── HumanBodyMap.tsx   #     人体器官可点击 Body Map
 │   │   │   └── ExternalLink/index.tsx #   外部链接包装组件
 │   │   ├── i18n/                      # 国际化配置
 │   │   │   ├── index.ts              #   i18next 初始化（localStorage 持久化）
 │   │   │   ├── zh.json               #   中文翻译（130+ 条目）
 │   │   │   └── en.json               #   英文翻译
 │   │   ├── pages/                     # 页面组件（路由对应）
-│   │   │   ├── Home/index.tsx         #   首页：Hero 横幅 + 搜索框 + 统计卡片 + 亮点/旭日图 + 流程图 + 外部链接
-│   │   │   ├── Search/index.tsx       #   搜索结果页
-│   │   │   ├── Browse/index.tsx       #   浏览页：侧边栏筛选 + 表格（移动端可折叠筛选面板）
-│   │   │   ├── Analysis/index.tsx     #   详情页：面包屑 + 侧边导航 + 8 个折叠面板
+│   │   │   ├── Home/index.tsx         #   首页：Hero 横幅 + 搜索框 + 搜索示例 + 统计卡片 + 滚动轮播亮点 + 统计总览（旭日图+嵌套饼图+年份条形图+Body Map）+ 流程图 + 外部链接
+│   │   │   ├── Search/index.tsx       #   搜索结果页（卡片展示）
+│   │   │   ├── Browse/index.tsx       #   浏览页：侧边栏筛选（组织/物种/体内体外/品系/性别/年份）+ 右侧卡片列表 + 排序
+│   │   │   ├── Analysis/index.tsx     #   详情页：面包屑 + sticky header + 侧边导航 + 5 个面板（Intersection Observer）
 │   │   │   ├── Download/index.tsx     #   下载页
-│   │   │   ├── Statistics/index.tsx   #   统计页
+│   │   │   ├── Statistics/index.tsx   #   统计页：统计总览 + Body Map + MESH 树状图
 │   │   │   └── Help/index.tsx         #   帮助页
 │   │   ├── assets/                    # 静态资源
 │   │   │   ├── banner.svg            #   首页 Hero 区背景图
@@ -77,7 +81,7 @@ SDNU/
 │   │   ├── config.py                  # 配置项（pydantic-settings，从 .env 读取）
 │   │   ├── database.py                # SQLAlchemy engine & session
 │   │   ├── models/                    # ORM 模型
-│   │   │   ├── main_record.py         #   MainRecord：主表（47 列）
+│   │   │   ├── main_record.py         #   MainRecord：主表（51 列，含 4 系统字段 + 47 Excel 源字段）
 │   │   │   └── record_asset.py        #   RecordAsset：资源表（12 列）
 │   │   ├── schemas/                   # Pydantic 数据模型
 │   │   │   ├── common.py              #   统一响应格式 + 分页结构
@@ -90,7 +94,7 @@ SDNU/
 │   │   │   ├── analysis.py            #   /api/analysis/{key}, .../tables/deg-table
 │   │   │   ├── assets.py              #   /api/assets/{id}/download
 │   │   │   ├── download.py            #   /api/download/database
-│   │   │   └── stats.py               #   /api/stats/summary
+│   │   │   └── stats.py               #   /api/stats/summary, /api/stats/publication-years, /api/stats/organ-distribution, /api/stats/mesh-tree
 │   │   └── services/                  # 业务逻辑层
 │   │       ├── search_service.py      #   搜索与筛选逻辑
 │   │       ├── analysis_service.py    #   详情查询
@@ -106,7 +110,7 @@ SDNU/
 │
 ├── database/                          # 数据库初始化模块
 │   ├── data/
-│   │   └── 260307小鼠双端信息全.xlsx    # 源数据 Excel（986 条样本记录）
+│   │   └── 260320小鼠双端信息新版本.xlsx  # 源数据 Excel（989 行，导入后 986 条记录）
 │   ├── sql/
 │   │   ├── 001_create_tables.sql      # 建表 SQL（main_records + record_assets）
 │   │   └── 002_verify_data.sql        # 数据验证 SQL（12 项完整性检查）
@@ -152,14 +156,14 @@ SDNU/
 | 唯一 DESEQ_ID | 78 |
 | 唯一 SRR_ID | 770 |
 | 唯一 GSE_ID | 40 |
-| 资源文件记录 | 355 |
+| 资源文件记录 | 642 |
 
 ### 3.2 表结构
 
 **`main_records`** -- 主表，保存 Excel 中的所有样本记录
 
 - 系统字段 4 个：`record_pk`（主键）、`analysis_key`（分析键）、`created_at`、`updated_at`
-- Excel 源字段 43 个：化学物信息、实验信息、样本信息、分类信息等
+- Excel 源字段 47 个：化学物信息、实验信息、样本信息、分类信息等（含新增字段 `summary_text`、`strain`、`in_vivo_vitro`、`gender`）
 - 索引：`analysis_key`、`chemical_id`、`cas_id`、`inchi_key`、`pubchem_cid`、`deseq_id`
 
 **`record_assets`** -- 资源表，保存 PDF/TXT 文件元信息
@@ -184,10 +188,13 @@ SDNU/
 |------|------|------|
 | `/api/health` | GET | 健康检查 |
 | `/api/stats/summary` | GET | 统计摘要（首页卡片数据） |
+| `/api/stats/publication-years` | GET | 按发表年份统计文献数量（年份条形图） |
+| `/api/stats/organ-distribution` | GET | 器官/组织分布统计（旭日图 + Body Map） |
+| `/api/stats/mesh-tree` | GET | MESH 分类树状结构（统计页树状图） |
 | `/api/search?keyword=&category=&page=&page_size=` | GET | 全局搜索（支持 all/cas/inchikey/chemical_name/pubchem_cid/deseq_id） |
 | `/api/search/export?keyword=&category=` | GET | 导出搜索结果为 Excel |
-| `/api/browse?tissue_category=&library_method=&year_min=&year_max=&page=` | GET | 浏览 + 筛选 |
-| `/api/browse/filters` | GET | 获取筛选选项（组织分类、建库方法、年份范围） |
+| `/api/browse?tissue_category=&organism=&in_vivo_vitro=&strain=&gender=&year_min=&year_max=&sort_by=&sort_order=&page=` | GET | 浏览 + 筛选 + 排序 |
+| `/api/browse/filters` | GET | 获取筛选选项（组织分类、物种、体内/体外、品系、性别、年份范围） |
 | `/api/analysis/{analysis_key}` | GET | 分析条目详情（基本信息 + 样本记录 + 资源列表） |
 | `/api/analysis/{analysis_key}/tables/deg-table?page=&page_size=` | GET | DEG 差异基因表分页数据 |
 | `/api/analysis/{analysis_key}/assets` | GET | 资源列表 |
@@ -207,28 +214,27 @@ SDNU/
 
 | 路由 | 页面 | 功能 |
 |------|------|------|
-| `/` | 首页 | Hero 横幅 + 搜索框 + 统计卡片 + 亮点/统计旭日图 + 分析流程图 + 外部链接 |
-| `/search?keyword=&category=` | 搜索结果页 | 搜索框 + 结果表格（分页 30 条）+ 导出按钮 |
-| `/browse` | 浏览页 | 左侧筛选面板（组织分类/建库方法/发表年份）+ 右侧数据表格 |
-| `/analysis/:analysisKey` | 详情页 | 面包屑导航 + 侧边导航 + 8 个可折叠面板 |
+| `/` | 首页 | Hero 横幅 + 搜索框 + 搜索示例 + 统计卡片 + 滚动轮播亮点 + 统计总览（旭日图+嵌套饼图+年份条形图+Body Map）+ 分析流程图 + 外部链接 |
+| `/search?keyword=&category=` | 搜索结果页 | 搜索框 + 卡片展示结果（分页 30 条）+ 导出按钮 |
+| `/browse` | 浏览页 | 左侧筛选面板（组织分类/物种/体内体外/品系/性别/发表年份）+ 右侧卡片列表 + 排序功能 |
+| `/analysis/:analysisKey` | 详情页 | 面包屑导航 + sticky header + 侧边导航 + 5 个面板（Intersection Observer 驱动滚动高亮） |
 | `/download` | 下载页 | 整库 Excel 下载 |
-| `/statistics` | 统计页 | 静态统计图表 |
+| `/statistics` | 统计页 | 统计总览 + Body Map + MESH 树状图 |
 | `/help` | 帮助页 | 使用说明、字段说明、外链说明、联系方式 |
 
 ### 5.2 详情页（Analysis）
 
-详情页采用折叠面板（Collapse）布局，左侧设有固定侧边导航栏，支持快速定位各区块。顶部显示面包屑导航（Home / Browse / DESEQ_ID）。
+详情页采用 5 个面板布局，左侧设有固定侧边导航栏，支持快速定位各区块（通过 Intersection Observer 自动高亮当前可见面板）。顶部显示面包屑导航（Home / Browse / DESEQ_ID）及 sticky header。
 
-8 个可折叠面板：
+5 个面板：
 
-1. **基本信息**：化学物名称、CAS 号、InChIKey、PubChem CID（外链）等
-2. **测序信息**：GSE_ID（外链 GEO）、SRR_ID（外链 SRA）、BioProject（外链）、Platform、AvgSpotLen 等
-3. **组织分类**：组织分类、组织细分、生殖细分、组织/细胞系、暴露毒物、剂量、暴露时间等
-4. **文献信息**：发表年月、参考文献、DOI（外链）
-5. **MESH 分类**：Class1–Class7（7 级分类）、推断分类
-6. **样本记录**：SRR_ID（外链 SRA）、处理条件、实验分组、剂量、暴露时间
-7. **图表资源**：9 个 PDF 预览卡片（PDF→PNG 渲染 + 下载）+ plot_df.txt 下载
-8. **DEG 表格**：解析 deg_table.txt，分页展示（每页 30 行）
+1. **毒物信息**：
+   - 毒物基本信息：Chemical_Name、Alternative_Names、PubChem_CID（外链）、PubChem_Name、CAS_ID、InChIKey、数据来源
+   - MESH 分类信息：链式展示（如 `双酚类（旧） → 酚类 → 苯衍生物 → 芳烃 → 碳氢化合物，环状 → 碳氢化合物 → D02 → D02`）
+2. **实验设计**：实验分组表格（Group/Chem_Name/剂量/时间）+ 文献名称、发表年月、DOI（外链）+ Summary + PCA 图
+3. **差异分析**：火山图 + DEG 差异基因表（分页展示）
+4. **富集分析**：热图 + KEGG/Reactome/Hallmark/DO 富集通路分析图
+5. **基因表达**：预留区域，待后续补充基因表达图像
 
 ### 5.3 国际化（i18n）
 
@@ -241,12 +247,11 @@ SDNU/
 
 首页自上而下包含以下区块：
 
-1. **Hero 横幅**：深蓝渐变背景 + 标题 + 副标题 + 描述文字 + 居中大搜索框
+1. **Hero 横幅**：深蓝渐变背景 + 标题（EDC-ToxDB）+ 副标题 + 描述文字 + 居中大搜索框 + 搜索示例
 2. **统计卡片**：4 张悬浮卡片（样本记录 / 分析条目 / 化学物种类 / DESEQ 分析数），负 margin 覆盖在 Banner 底部
-3. **亮点 + 统计总览**（并排两列）：
-   - 左侧「数据库亮点」：4 个 CheckCircle 图标特色要点
-   - 右侧「统计总览」：ECharts 旭日图（内环 4 大类：文献/数据集/样本/化学物，外环展示具体指标），等分扇区，点击跳转浏览页
-4. **分析流程 + 外部资源**（并排两列）：5 步流程图（FASTQ → QC → DESeq2 → 富集分析 → 数据库）+ 外部学术资源链接
+3. **亮点（滚动轮播）**：数据库亮点以条形滚动方式展示，支持自动轮播
+4. **统计总览**：旭日图（内环 4 大类，外环具体指标）+ 嵌套饼图 + 年份条形图（按发表年份统计文献数量）+ Body Map（小鼠/人体器官可点击，点击跳转浏览页筛选）
+5. **分析流程 + 外部资源**（并排两列）：5 步流程图（FASTQ → QC → DESeq2 → 富集分析 → 数据库）+ 外部学术资源链接
 
 ### 5.5 移动端适配
 
@@ -306,11 +311,11 @@ mysql -u mousetoxdb -pmousetoxdb_pass mousetoxdb < database/sql/001_create_table
 # 安装脚本依赖
 pip install openpyxl pymysql python-dotenv
 
-# 导入 Excel 数据（986 条记录）
+# 导入 Excel 数据（989 行 Excel → 986 条记录导入）
 cd database
-python scripts/import_excel.py --excel data/260307小鼠双端信息全.xlsx
+python scripts/import_excel.py --excel data/260320小鼠双端信息新版本.xlsx
 
-# 扫描资源文件（生成 355 条资源记录）
+# 扫描资源文件（生成 642 条资源记录）
 python scripts/scan_assets.py --assets-dir ../demo
 
 # 验证数据完整性
@@ -327,7 +332,7 @@ cp .env.example .env
 # 编辑 .env，确保以下配置：
 #   MYSQL_HOST=localhost
 #   ASSETS_DIR=/absolute/path/to/SDNU/demo
-#   EXCEL_PATH=/absolute/path/to/SDNU/database/data/260307小鼠双端信息全.xlsx
+#   EXCEL_PATH=/absolute/path/to/SDNU/database/data/260320小鼠双端信息新版本.xlsx
 
 # 安装依赖
 pip install -r requirements.txt
@@ -362,7 +367,7 @@ npm run dev
 SDNU/
 ├── data/
 │   ├── source_excel/
-│   │   └── 260307小鼠双端信息全.xlsx
+│   │   └── 260320小鼠双端信息新版本.xlsx
 │   ├── deseq_assets/        # 即 demo/ 目录的内容
 │   │   ├── DESEQ0005/
 │   │   ├── DESEQ1001/
@@ -454,7 +459,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       ASSETS_DIR: /data/deseq_assets
-      EXCEL_PATH: /data/source_excel/260307小鼠双端信息全.xlsx
+      EXCEL_PATH: /data/source_excel/260320小鼠双端信息新版本.xlsx
       STATISTICS_DIR: /data/statistics
     volumes:
       - ./data:/data:ro
@@ -515,7 +520,7 @@ docker compose exec backend python scripts/scan_assets.py
 `import_excel.py` 执行以下步骤：
 
 1. 读取 Excel（Sheet1，第 3 行表头，第 4 行起数据）
-2. 43 个 Excel 列名映射为数据库 snake_case 字段名
+2. 47 个 Excel 列名映射为数据库 snake_case 字段名（含新增字段 `summary_text`、`strain`、`in_vivo_vitro`、`gender`）
 3. 数据清洗：
    - 去除首尾空格及 `\xa0` 等不可见字符
    - 空字符串转 NULL
@@ -555,7 +560,7 @@ docker compose exec backend python scripts/scan_assets.py
 - 搜索结果按 `analysis_key` 分组，使用 `GROUP BY` + `MIN()` 聚合
 - 通过子查询检查 `record_assets` 表判断 `has_assets` 标志
 - 排序：先按 `chemical_id` 升序，再按 `deseq_id` 升序
-- 搜索结果页每页 30 条
+- 搜索结果页每页 30 条，以卡片形式展示
 
 ### 8.4 DEG 表格解析
 
@@ -604,17 +609,33 @@ docker compose exec backend python scripts/scan_assets.py
 | `MYSQL_USER` | mousetoxdb | 数据库用户名 |
 | `MYSQL_PASSWORD` | mousetoxdb_pass | 数据库密码 |
 | `ASSETS_DIR` | /data/deseq_assets | 资源文件目录 |
-| `EXCEL_PATH` | /data/source_excel/260307小鼠双端信息全.xlsx | 源数据 Excel 路径 |
+| `EXCEL_PATH` | /data/source_excel/260320小鼠双端信息新版本.xlsx | 源数据 Excel 路径 |
 | `STATISTICS_DIR` | /data/statistics | 统计图片目录 |
 | `URL_PREFIX` | （空） | 子路径部署前缀（如 `/SDNU`），用于生成资源 URL |
 
+> **⚠️ 重要**：`URL_PREFIX` 字段必须在 `backend/app/config.py` 的 `Settings` 类中定义（即使本地开发时为空）。服务器 `.env` 中设置了 `URL_PREFIX=/SDNU`，如果 config.py 中缺少该字段，pydantic-settings 会因为严格模式报错导致后端无法启动。后端所有资源 URL 拼接（如 `preview_url`、`download_url`）都应使用 `settings.URL_PREFIX` 前缀。
+
 ---
 
-## 10. 服务器部署（子路径方式）
+## 10. 服务器部署注意事项
+
+### 10.0 代码覆盖检查清单
+
+每次将本地代码同步到服务器前，务必检查以下事项：
+
+1. **本地先 `npm run build`** — 确保 TypeScript 编译无错误（`npm run dev` 不做严格检查，`build` 会）
+2. **检查 `config.py` 是否包含所有服务器 `.env` 中的字段** — 特别是 `URL_PREFIX`，缺少会导致后端启动崩溃
+3. **检查 ORM model 是否新增了数据库列** — 对比 `models/main_record.py` 与服务器表结构（`DESCRIBE main_records`），新增列需手动 `ALTER TABLE`，并重新导入数据
+4. **检查资源 URL 是否使用 `settings.URL_PREFIX`** — 硬编码 `/static/assets/...` 在服务器上会 404
+5. **同步后重新打子路径补丁** — rsync 覆盖 src 后需重新应用 `/SDNU` 适配（详见 `server.md` 4.2 节）
+
+---
+
+## 11. 服务器部署（子路径方式）
 
 项目已部署在 Vultr VPS 上，通过 `2584256188.work/SDNU` 访问，与同服务器的 WordPress 博客共存。
 
-### 10.1 部署架构
+### 11.1 部署架构
 
 ```
 Nginx (80/443)
@@ -624,7 +645,7 @@ Nginx (80/443)
 └── ^~ /SDNU/static/ → proxy_pass http://127.0.0.1:8001 # 静态资源
 ```
 
-### 10.2 子路径适配要点
+### 11.2 子路径适配要点
 
 | 配置项 | 修改内容 |
 |--------|---------|
@@ -635,7 +656,7 @@ Nginx (80/443)
 | 后端 `.env` | `URL_PREFIX=/SDNU` |
 | 后端 `analysis_service.py` | 资源 URL 使用 `settings.URL_PREFIX` 前缀 |
 
-### 10.3 后端服务
+### 11.3 后端服务
 
 后端以 systemd 服务运行：
 
@@ -646,7 +667,7 @@ WorkingDirectory=/root/Web/SDNU/backend
 ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-### 10.4 Nginx 注意事项
+### 11.4 Nginx 注意事项
 
 - 使用 `^~` 前缀匹配（优先于 WordPress 的 regex location）
 - 前端使用 `root /var/www` + symlink `/var/www/SDNU → dist/`（`alias` + `try_files` 在 Nginx 中不兼容）

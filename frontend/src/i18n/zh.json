@@ -13,7 +13,7 @@
     "total": "共 {{count}} 条",
     "notFound": "分析条目未找到",
     "noData": "暂无数据",
-    "subtitle": "小鼠毒理转录组数据库"
+    "subtitle": "Endocrine Disrupting Chemicals Toxicogenomics Database"
   },
   "search": {
     "all": "全部",
@@ -40,7 +40,7 @@
     "sampleCount": "样本数"
   },
   "home": {
-    "description": "MouseToxDB 整合了小鼠暴露于多种化学毒物后的转录组差异分析数据，提供检索、浏览和下载服务，为毒理基因组学研究提供数据支撑。",
+    "description": "EDC-ToxDB 整合了小鼠暴露于多种化学毒物后的转录组差异分析数据，提供检索、浏览和下载服务，为毒理基因组学研究提供数据支撑。",
     "sampleRecords": "样本记录",
     "analysisItems": "分析条目",
     "chemicalTypes": "化学物种类",
@@ -51,46 +51,78 @@
     "qc": "质控 & 比对",
     "deseq2": "DESeq2 差异分析",
     "enrichment": "富集分析（KEGG / Reactome / Hallmark / DO）",
-    "database": "MouseToxDB 数据库",
+    "database": "EDC-ToxDB 数据库",
     "externalResources": "常用外部资源",
     "geo": "GEO 数据库",
     "highlights": "数据库亮点",
     "highlightData": "整合 7,000+ 条样本数据信息",
-    "highlightTissue": "覆盖多种组织系统（肝脏、生殖、心脏、肺等）",
-    "highlightOmics": "转录组学差异表达分析（DESeq2）",
+    "highlightDataDesc": "涵盖989条样本记录，覆盖37种化学物质",
+    "highlightTissue": "覆盖多种组织系统",
+    "highlightTissueDesc": "7大组织分类系统",
     "highlightPipeline": "标准化分析流程与富集通路注释",
+    "highlightPipelineDesc": "DESeq2差异分析 + KEGG/Reactome/Hallmark/DO富集",
     "statsOverview": "统计总览",
     "statsLiterature": "文献",
     "statsDatasets": "数据集",
     "statsSamples": "样本",
-    "statsChemicals": "化学物"
+    "statsChemicals": "化学物",
+    "searchExample": "eg:",
+    "publicationYearChart": "文献发表年份分布",
+    "organDistChart": "器官分类分布",
+    "mouseBodyMap": "小鼠体图",
+    "humanBodyMap": "人体图"
   },
   "browse": {
     "filters": "筛选条件",
     "tissueCategory": "组织分类",
-    "libraryMethod": "建库方法",
-    "publicationYear": "发表年份"
+    "publicationYear": "发表年份",
+    "organism": "物种",
+    "inVivoVitro": "体内/体外",
+    "strain": "品系",
+    "gender": "性别",
+    "sortBy": "排序方式",
+    "sortDeseqId": "DESEQ ID",
+    "sortChemicalName": "化学物名称",
+    "sortPublicationYear": "发表年份",
+    "sortGseId": "GSE ID",
+    "ascending": "升序",
+    "descending": "降序",
+    "toxicant": "毒物",
+    "dose": "剂量",
+    "tissue": "组织",
+    "cellLine": "细胞系"
   },
   "download": {
     "title": "数据下载",
     "fullDb": "完整数据库 Excel",
-    "fullDbDesc": "下载 MouseToxDB 完整数据表，包含所有样本记录和分析信息。",
+    "fullDbDesc": "下载 EDC-ToxDB 完整数据表，包含所有样本记录和分析信息。",
     "downloadBtn": "下载完整数据"
   },
   "statistics": {
     "title": "数据统计",
-    "noCharts": "暂无统计图表"
+    "noCharts": "暂无统计图表",
+    "meshTree": "MESH 分类树",
+    "overview": "统计总览"
   },
   "analysis": {
+    "toxicantInfo": "毒物信息",
+    "experiment": "实验设计",
+    "differential": "差异分析",
+    "enrichment": "富集分析",
+    "expression": "基因表达",
     "basicInfo": "基本信息",
+    "classificationInfo": "分类信息",
+    "sampleTable": "样本表格",
+    "literatureInfo": "文献信息",
+    "summaryText": "Summary",
     "sequencingInfo": "测序信息",
     "tissueClassification": "组织分类",
-    "literatureInfo": "文献信息",
     "meshClassification": "MESH 分类",
     "sampleRecords": "样本记录",
     "chartResources": "图表资源",
     "degTable": "DEG表格",
     "chemicalName": "化学物名称",
+    "alternativeNames": "别名",
     "casId": "CAS 号",
     "inchiKey": "InChIKey",
     "pubchemCid": "PubChem CID",
@@ -133,7 +165,15 @@
     "reactomeDown": "Reactome 下调",
     "hallmarkUp": "Hallmark 上调",
     "doUp": "DO 上调",
-    "downloadPlotDf": "下载绘图数据（plot_df.txt）"
+    "downloadPlotDf": "下载绘图数据（plot_df.txt）",
+    "fromGroup": "数据来源分组",
+    "strain": "品系/细胞系",
+    "inVivoVitro": "体内/体外",
+    "gender": "性别",
+    "expressionComingSoon": "该模块正在建设中，敬请期待",
+    "pcaPlot": "PCA 图",
+    "volcanoPlot": "火山图",
+    "heatmap": "热图"
   },
   "deg": {
     "parseFailed": "文件解析失败",
@@ -148,13 +188,13 @@
   "help": {
     "title": "使用帮助",
     "usageGuide": "网站使用说明",
-    "usageIntro": "MouseToxDB 是一个公开访问的小鼠毒理转录组数据库。您可以通过以下方式使用本网站：",
+    "usageIntro": "EDC-ToxDB 是一个公开访问的内分泌干扰物毒理转录组数据库。您可以通过以下方式使用本网站：",
     "searchLabel": "搜索：",
     "searchDesc": "在首页或导航栏搜索框中输入关键词（化学物名称、CAS 号、InChIKey、PubChem CID 或 DESEQ_ID），系统将返回匹配的分析条目。您可以通过下拉菜单选择搜索分类来缩小搜索范围。",
     "browseLabel": "浏览：",
-    "browseDesc": "在「浏览」页面，您可以查看所有分析条目，并通过左侧筛选面板按组织分类、建库方法和发表年份进行筛选。",
+    "browseDesc": "在「浏览」页面，您可以查看所有分析条目，并通过左侧筛选面板按组织分类、发表年份等进行筛选。",
     "detailLabel": "详情：",
-    "detailDesc": "点击表格中的 DESEQ_ID 链接，进入分析条目详情页。详情页包含基本信息、实验信息、样本记录、图表资源和 DEG 差异基因表五个标签页。",
+    "detailDesc": "点击表格中的 DESEQ_ID 链接，进入分析条目详情页。详情页包含毒物信息、实验设计、差异分析、富集分析和基因表达五个板块。",
     "downloadLabel": "下载：",
     "downloadDesc": "在「下载」页面可下载完整数据库 Excel 文件。在搜索结果页可导出当前搜索结果。",
     "fieldTitle": "主要字段说明",
@@ -181,6 +221,6 @@
     "contactTitle": "联系方式",
     "contactDesc": "如有问题或建议，请联系研究团队。",
     "citationTitle": "引用说明",
-    "citationDesc": "如果您在研究中使用了 MouseToxDB 的数据，请引用本数据库。具体引用格式请参考相关发表论文。"
+    "citationDesc": "如果您在研究中使用了 EDC-ToxDB 的数据，请引用本数据库。具体引用格式请参考相关发表论文。"
   }
 }

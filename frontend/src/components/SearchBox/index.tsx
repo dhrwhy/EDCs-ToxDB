@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Select, Space } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import useIsMobile from "../../hooks/useIsMobile";
 
 interface Props {
   onSearch: (keyword: string, category: string) => void;
@@ -21,6 +22,9 @@ const SearchBox: React.FC<Props> = ({
   const [keyword, setKeyword] = useState(defaultKeyword);
   const [category, setCategory] = useState(defaultCategory);
 
+  useEffect(() => { setKeyword(defaultKeyword); }, [defaultKeyword]);
+  useEffect(() => { setCategory(defaultCategory); }, [defaultCategory]);
+
   const categoryOptions = [
     { value: "all", label: t("search.all") },
     { value: "cas", label: t("search.cas") },
@@ -36,7 +40,7 @@ const SearchBox: React.FC<Props> = ({
     }
   };
 
-  const isMobile = window.innerWidth < 768;
+  const isMobile = useIsMobile();
 
   if (compact) {
     return (

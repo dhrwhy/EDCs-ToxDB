@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, SmallInteger, String, Text, DateTime
+from sqlalchemy import Column, BigInteger, Integer, SmallInteger, String, Text, DateTime, func
 from app.database import Base
 
 
@@ -7,11 +7,11 @@ class MainRecord(Base):
 
     # 系统字段
     record_pk = Column(BigInteger, primary_key=True, autoincrement=True)
-    analysis_key = Column(String(128), nullable=False, index=True)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    analysis_key = Column(String(128), nullable=False, unique=True, index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 
-    # Excel 源字段（43 列）
+    # Excel 源字段（47 列）
     sort_id = Column(Integer, nullable=False)
     chemical_id = Column(Integer, nullable=False, index=True)
     cas_id = Column(String(50), nullable=False, index=True)
@@ -36,6 +36,12 @@ class MainRecord(Base):
     chem_name = Column(String(255), nullable=True)
     dose = Column(String(100), nullable=True)
     exposure_time = Column(String(100), nullable=True)
+    # 新增4列 (Col 25-28)
+    summary_text = Column(Text, nullable=True)
+    strain = Column(String(255), nullable=True)
+    in_vivo_vitro = Column(String(20), nullable=True)
+    gender = Column(String(20), nullable=True)
+    # 原 Col 25-43 后移为 Col 29-47
     tissue_category = Column(String(100), nullable=False)
     tissue_subcategory = Column(String(100), nullable=True)
     reproductive_subcategory = Column(String(100), nullable=True)

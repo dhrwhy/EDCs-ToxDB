@@ -22,7 +22,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-mousetoxdb}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mousetoxdb_pass}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ../sql/001_create_tables.sql:/docker-entrypoint-initdb.d/001_create_tables.sql:ro

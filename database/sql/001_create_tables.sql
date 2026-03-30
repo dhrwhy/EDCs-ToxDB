@@ -16,7 +16,7 @@ CREATE TABLE main_records (
     created_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    -- ========== Excel 源字段（43 列） ==========
+    -- ========== Excel 源字段（47 列） ==========
     sort_id                  INT          NOT NULL                COMMENT 'Excel原始排序号',
     chemical_id              INT          NOT NULL                COMMENT '化学物质内部编号(ID列)',
     cas_id                   VARCHAR(50)  NOT NULL                COMMENT 'CAS编号',
@@ -41,6 +41,10 @@ CREATE TABLE main_records (
     chem_name                VARCHAR(255) NULL                    COMMENT '实验中化学名称/简称',
     dose                     VARCHAR(100) NULL                    COMMENT '暴露剂量',
     exposure_time            VARCHAR(100) NULL                    COMMENT '暴露时间',
+    summary_text             TEXT         NULL                    COMMENT 'Summary摘要',
+    strain                   VARCHAR(255) NULL                    COMMENT '品系',
+    in_vivo_vitro            VARCHAR(20)  NULL                    COMMENT '体内或体外',
+    gender                   VARCHAR(20)  NULL                    COMMENT '性别',
     tissue_category          VARCHAR(100) NOT NULL                COMMENT '组织一级分类',
     tissue_subcategory       VARCHAR(100) NULL                    COMMENT '组织二级分类',
     reproductive_subcategory VARCHAR(100) NULL                    COMMENT '生殖系统细分',
@@ -62,7 +66,7 @@ CREATE TABLE main_records (
     inferred_class           VARCHAR(100) NULL                    COMMENT '推断分类',
 
     -- ========== 索引 ==========
-    INDEX idx_analysis_key (analysis_key),
+    UNIQUE INDEX idx_analysis_key (analysis_key),
     INDEX idx_chemical_id (chemical_id),
     INDEX idx_cas_id (cas_id),
     INDEX idx_inchi_key (inchi_key),

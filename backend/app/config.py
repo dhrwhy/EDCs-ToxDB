@@ -6,13 +6,16 @@ class Settings(BaseSettings):
     MYSQL_HOST: str = "localhost"
     MYSQL_PORT: int = 3306
     MYSQL_DATABASE: str = "mousetoxdb"
-    MYSQL_USER: str = "mousetoxdb"
-    MYSQL_PASSWORD: str = "mousetoxdb_pass"
+    MYSQL_USER: str
+    MYSQL_PASSWORD: str
 
     # 文件路径
     ASSETS_DIR: str = "/data/deseq_assets"
-    EXCEL_PATH: str = "/data/source_excel/260307小鼠双端信息全.xlsx"
+    EXCEL_PATH: str = "/data/source_excel/260320小鼠双端信息新版本.xlsx"
     STATISTICS_DIR: str = "/data/statistics"
+
+    # 子路径部署前缀
+    URL_PREFIX: str = ""
 
     @property
     def DATABASE_URL(self) -> str:

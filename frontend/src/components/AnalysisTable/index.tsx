@@ -4,7 +4,6 @@ import type { ColumnsType } from "antd/es/table";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { AnalysisItem } from "../../types";
-import { displayValue } from "../../utils/formatters";
 import { externalLinks } from "../../utils/externalLinks";
 import ExternalLink from "../ExternalLink";
 
@@ -72,18 +71,6 @@ const AnalysisTable: React.FC<Props> = ({
       dataIndex: "tissue_category",
       width: 110,
     },
-    {
-      title: t("table.libraryMethod"),
-      dataIndex: "library_method",
-      width: 130,
-      render: (val: string | null) => displayValue(val),
-    },
-    {
-      title: t("table.sampleCount"),
-      dataIndex: "sample_count",
-      width: 80,
-      align: "center",
-    },
   ];
 
   return (
@@ -93,7 +80,7 @@ const AnalysisTable: React.FC<Props> = ({
       dataSource={items}
       loading={loading}
       bordered
-      scroll={{ x: 1060 }}
+      scroll={{ x: 850 }}
       pagination={{
         current: page,
         pageSize,

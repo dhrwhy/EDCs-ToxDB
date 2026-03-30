@@ -13,7 +13,7 @@
     "total": "Total {{count}}",
     "notFound": "Analysis entry not found",
     "noData": "No data available",
-    "subtitle": "Mouse Toxicology Transcriptomics Database"
+    "subtitle": "Endocrine Disrupting Chemicals Toxicogenomics Database"
   },
   "search": {
     "all": "All",
@@ -40,7 +40,7 @@
     "sampleCount": "Samples"
   },
   "home": {
-    "description": "MouseToxDB integrates transcriptomic differential analysis data from mice exposed to various chemical toxicants, providing search, browse, and download services to support toxicogenomics research.",
+    "description": "EDC-ToxDB integrates transcriptomic differential analysis data from mice exposed to various endocrine disrupting chemicals, providing search, browse, and download services to support toxicogenomics research.",
     "sampleRecords": "Sample Records",
     "analysisItems": "Analysis Entries",
     "chemicalTypes": "Chemical Types",
@@ -51,46 +51,78 @@
     "qc": "QC & Alignment",
     "deseq2": "DESeq2 Differential Analysis",
     "enrichment": "Enrichment (KEGG / Reactome / Hallmark / DO)",
-    "database": "MouseToxDB Database",
+    "database": "EDC-ToxDB Database",
     "externalResources": "External Resources",
     "geo": "GEO Database",
     "highlights": "Highlights",
     "highlightData": "Integrating 7,000+ sample data records",
-    "highlightTissue": "Covering multiple tissue systems (liver, reproductive, heart, lung, etc.)",
-    "highlightOmics": "Transcriptomic differential expression analysis (DESeq2)",
+    "highlightDataDesc": "Covering 989 sample records across 37 chemicals",
+    "highlightTissue": "Covering multiple tissue systems",
+    "highlightTissueDesc": "7 major tissue classification systems",
     "highlightPipeline": "Standardized analysis pipeline with pathway enrichment",
+    "highlightPipelineDesc": "DESeq2 differential analysis + KEGG/Reactome/Hallmark/DO enrichment",
     "statsOverview": "Statistics Overview",
     "statsLiterature": "Literature",
     "statsDatasets": "Datasets",
     "statsSamples": "Samples",
-    "statsChemicals": "Chemicals"
+    "statsChemicals": "Chemicals",
+    "searchExample": "eg:",
+    "publicationYearChart": "Publication Year Distribution",
+    "organDistChart": "Organ Classification Distribution",
+    "mouseBodyMap": "Mouse Body Map",
+    "humanBodyMap": "Human Body Map"
   },
   "browse": {
     "filters": "Filters",
     "tissueCategory": "Tissue Category",
-    "libraryMethod": "Library Method",
-    "publicationYear": "Publication Year"
+    "publicationYear": "Publication Year",
+    "organism": "Organism",
+    "inVivoVitro": "In Vivo / In Vitro",
+    "strain": "Strain",
+    "gender": "Gender",
+    "sortBy": "Sort By",
+    "sortDeseqId": "DESEQ ID",
+    "sortChemicalName": "Chemical Name",
+    "sortPublicationYear": "Publication Year",
+    "sortGseId": "GSE ID",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "toxicant": "Toxicant",
+    "dose": "Dose",
+    "tissue": "Tissue",
+    "cellLine": "Cell Line"
   },
   "download": {
     "title": "Data Download",
     "fullDb": "Complete Database Excel",
-    "fullDbDesc": "Download the complete MouseToxDB data table, including all sample records and analysis information.",
+    "fullDbDesc": "Download the complete EDC-ToxDB data table, including all sample records and analysis information.",
     "downloadBtn": "Download Full Data"
   },
   "statistics": {
     "title": "Data Statistics",
-    "noCharts": "No statistics charts available"
+    "noCharts": "No statistics charts available",
+    "meshTree": "MESH Classification Tree",
+    "overview": "Statistics Overview"
   },
   "analysis": {
+    "toxicantInfo": "Toxicant Info",
+    "experiment": "Experiment Design",
+    "differential": "Differential Analysis",
+    "enrichment": "Enrichment Analysis",
+    "expression": "Gene Expression",
     "basicInfo": "Basic Info",
+    "classificationInfo": "Classification Info",
+    "sampleTable": "Sample Table",
+    "literatureInfo": "Literature Info",
+    "summaryText": "Summary",
     "sequencingInfo": "Sequencing Info",
     "tissueClassification": "Tissue Classification",
-    "literatureInfo": "Literature Info",
     "meshClassification": "MESH Classification",
     "sampleRecords": "Sample Records",
     "chartResources": "Charts",
     "degTable": "DEG Table",
     "chemicalName": "Chemical Name",
+    "alternativeNames": "Alternative Names",
     "casId": "CAS No.",
     "inchiKey": "InChIKey",
     "pubchemCid": "PubChem CID",
@@ -133,7 +165,15 @@
     "reactomeDown": "Reactome Down",
     "hallmarkUp": "Hallmark Up",
     "doUp": "DO Up",
-    "downloadPlotDf": "Download plot data (plot_df.txt)"
+    "downloadPlotDf": "Download plot data (plot_df.txt)",
+    "fromGroup": "Data Source Group",
+    "strain": "Strain / Cell Line",
+    "inVivoVitro": "In Vivo / In Vitro",
+    "gender": "Gender",
+    "expressionComingSoon": "This module is under construction, please stay tuned",
+    "pcaPlot": "PCA Plot",
+    "volcanoPlot": "Volcano Plot",
+    "heatmap": "Heatmap"
   },
   "deg": {
     "parseFailed": "File parsing failed",
@@ -148,13 +188,13 @@
   "help": {
     "title": "User Guide",
     "usageGuide": "Website Usage Guide",
-    "usageIntro": "MouseToxDB is a publicly accessible mouse toxicology transcriptomics database. You can use this website as follows:",
+    "usageIntro": "EDC-ToxDB is a publicly accessible endocrine disrupting chemicals toxicogenomics database. You can use this website as follows:",
     "searchLabel": "Search:",
     "searchDesc": "Enter keywords in the search box on the homepage or navigation bar (chemical name, CAS No., InChIKey, PubChem CID or DESEQ_ID), and the system will return matching analysis entries. You can narrow the search by selecting a category from the dropdown menu.",
     "browseLabel": "Browse:",
-    "browseDesc": "On the Browse page, you can view all analysis entries and filter by tissue category, library method, and publication year through the filter panel on the left.",
+    "browseDesc": "On the Browse page, you can view all analysis entries and filter by tissue category, publication year, and other criteria through the filter panel on the left.",
     "detailLabel": "Details:",
-    "detailDesc": "Click the DESEQ_ID link in the table to access the analysis details page. It contains five tabs: Basic Info, Experiment Info, Sample Records, Charts, and DEG Table.",
+    "detailDesc": "Click the DESEQ_ID link in the table to access the analysis details page. It contains five sections: Toxicant Info, Experiment Design, Differential Analysis, Enrichment Analysis, and Gene Expression.",
     "downloadLabel": "Download:",
     "downloadDesc": "On the Download page, you can download the complete database Excel file. Search results can be exported on the search results page.",
     "fieldTitle": "Field Descriptions",
@@ -181,6 +221,6 @@
     "contactTitle": "Contact",
     "contactDesc": "For questions or suggestions, please contact the research team.",
     "citationTitle": "Citation",
-    "citationDesc": "If you use MouseToxDB data in your research, please cite this database. Refer to related publications for the citation format."
+    "citationDesc": "If you use EDC-ToxDB data in your research, please cite this database. Refer to related publications for the citation format."
   }
 }

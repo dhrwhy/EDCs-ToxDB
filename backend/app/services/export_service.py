@@ -9,7 +9,7 @@ def generate_export_excel(items: list) -> tuple[io.BytesIO, str]:
 
     # 生成文件名
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"MouseToxDB_搜索结果_{timestamp}.xlsx"
+    filename = f"EDC-ToxDB_搜索结果_{timestamp}.xlsx"
 
     # 生成 Excel
     buffer = io.BytesIO()

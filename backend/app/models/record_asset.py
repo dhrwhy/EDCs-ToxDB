@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, String, Text, DateTime
+from sqlalchemy import Column, BigInteger, Integer, String, Text, DateTime, func
 from app.database import Base
 
 
@@ -16,5 +16,5 @@ class RecordAsset(Base):
     parse_mode = Column(String(20), nullable=False, default="none")
     status = Column(String(20), nullable=False, default="available", index=True)
     remark = Column(Text, nullable=True)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())

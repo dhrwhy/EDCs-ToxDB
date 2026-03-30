@@ -13,6 +13,9 @@ export const externalLinks = {
 
   doi: (rawDoi: string) => {
     const cleaned = rawDoi.replace(/^(doi:|DOI：)\s*/i, "");
+    if (cleaned.startsWith("http://") || cleaned.startsWith("https://")) {
+      return cleaned;
+    }
     return `https://doi.org/${cleaned}`;
   },
 };

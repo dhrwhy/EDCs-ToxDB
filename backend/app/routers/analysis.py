@@ -46,9 +46,14 @@ def get_deg_table(
         )
 
     deseq_id = record.deseq_id
-    file_path = str(
-        Path(settings.ASSETS_DIR) / deseq_id / f"{deseq_id}_deg_table.txt"
-    )
+    base = Path(settings.ASSETS_DIR).resolve()
+    resolved = (base / deseq_id / f"{deseq_id}_deg_table.txt").resolve()
+    if not str(resolved).startswith(str(base) + "/"):
+        return JSONResponse(
+            status_code=400,
+            content=error_response(400, "无效的文件路径"),
+        )
+    file_path = str(resolved)
 
     result = parse_deg_table(file_path, page, page_size)
     return success_response(result)

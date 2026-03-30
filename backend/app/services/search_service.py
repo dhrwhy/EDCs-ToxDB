@@ -4,9 +4,15 @@ from app.models.main_record import MainRecord
 from app.models.record_asset import RecordAsset
 
 
+def _escape_like(keyword: str) -> str:
+    """转义 LIKE 通配符 % 和 _"""
+    return keyword.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
 def build_search_query(db: Session, keyword: str, category: str = "all"):
     """构建搜索查询，按 analysis_key 去重返回分析条目级结果"""
-    like_keyword = f"%{keyword}%"
+    escaped = _escape_like(keyword)
+    like_keyword = f"%{escaped}%"
 
     # 使用 MIN() 包裹非分组列，满足 ONLY_FULL_GROUP_BY 要求
     # 同一 analysis_key 下这些字段值相同，MIN 不影响结果
@@ -37,9 +43,9 @@ def build_search_query(db: Session, keyword: str, category: str = "all"):
     elif category == "chemical_name":
         query = query.filter(
             or_(
-                MainRecord.chemical_name.like(like_keyword),
-                MainRecord.alternative_names.like(like_keyword),
-                MainRecord.pubchem_name.like(like_keyword),
+                MainRecord.chemical_name.like(like_keyword, escape="\\"),
+                MainRecord.alternative_names.like(like_keyword, escape="\\"),
+                MainRecord.pubchem_name.like(like_keyword, escape="\\"),
             )
         )
     elif category == "pubchem_cid":
@@ -54,9 +60,9 @@ def build_search_query(db: Session, keyword: str, category: str = "all"):
                 MainRecord.inchi_key == keyword,
                 MainRecord.pubchem_cid == keyword,
                 MainRecord.deseq_id == keyword,
-                MainRecord.chemical_name.like(like_keyword),
-                MainRecord.alternative_names.like(like_keyword),
-                MainRecord.pubchem_name.like(like_keyword),
+                MainRecord.chemical_name.like(like_keyword, escape="\\"),
+                MainRecord.alternative_names.like(like_keyword, escape="\\"),
+                MainRecord.pubchem_name.like(like_keyword, escape="\\"),
             )
         )
 
@@ -121,10 +127,11 @@ def search_analyses(db: Session, keyword: str, category: str = "all",
     }
 
 
-def search_all_for_export(db: Session, keyword: str, category: str = "all") -> list:
-    """搜索全部结果（不分页），用于导出"""
+def search_all_for_export(db: Session, keyword: str, category: str = "all",
+                          max_rows: int = 10000) -> list:
+    """搜索全部结果（不分页），用于导出，最多 max_rows 行"""
     query = build_search_query(db, keyword, category)
-    rows = query.all()
+    rows = query.limit(max_rows).all()
 
     items = []
     for r in rows:

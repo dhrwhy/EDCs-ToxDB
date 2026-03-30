@@ -1,12 +1,16 @@
 import os
+import logging
 from fastapi import FastAPI, Request
+from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.routers import search, browse, analysis, assets, download, stats
 
-app = FastAPI(title="MouseToxDB API", version="1.0", description="小鼠毒理转录组数据库 API")
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="EDC-ToxDB API", version="2.0", description="EDC-ToxDB — Endocrine Disrupting Chemicals Toxicogenomics Database API")
 
 # CORS 配置
 app.add_middleware(
@@ -25,9 +29,12 @@ app.include_router(assets.router)
 app.include_router(download.router)
 
 
-# 全局异常处理
+# 全局异常处理（仅捕获非 HTTP 异常，HTTPException 由 FastAPI 默认处理）
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    if isinstance(exc, HTTPException):
+        raise exc
+    logger.exception("Unhandled exception on %s %s", request.method, request.url)
     return JSONResponse(
         status_code=500,
         content={

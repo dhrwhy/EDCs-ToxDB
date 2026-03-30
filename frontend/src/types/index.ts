@@ -8,14 +8,17 @@ export interface AnalysisItem {
   chemical_name: string;
   pubchem_cid: string;
   pubchem_name: string;
+  alternative_names: string | null;
   gse_id: string;
   bioproject_id: string;
   organism: string;
   tissue_category: string;
-  library_method: string | null;
+  tissue_subcategory: string | null;
   platform: string;
   publication_year: number | null;
-  sample_count: number;
+  dose: string | null;
+  cell_type: string | null;
+  doi: string | null;
   has_assets: boolean;
 }
 
@@ -46,6 +49,10 @@ export interface AnalysisSummary {
   publication_month: number | null;
   reference_title: string | null;
   doi: string | null;
+  summary_text: string | null;
+  strain: string | null;
+  in_vivo_vitro: string | null;
+  gender: string | null;
   class1_code: string;
   class2_code: string;
   class3_name: string | null;
@@ -123,8 +130,37 @@ export interface StatisticsAsset {
 /** 浏览筛选选项 */
 export interface BrowseFilters {
   tissue_categories: string[];
-  library_methods: string[];
   year_range: { min: number | null; max: number | null };
+  organisms: string[];
+  in_vivo_vitro_options: string[];
+  strains: string[];
+  genders: string[];
+}
+
+/** Publication year data */
+export interface PublicationYearData {
+  year: number;
+  count: number;
+}
+
+/** Organ distribution data */
+export interface OrganDistributionData {
+  tissue_category: string;
+  tissue_subcategory: string | null;
+  count: number;
+}
+
+/** MESH tree node */
+export interface MeshTreeNode {
+  name: string;
+  children: MeshTreeNode[];
+  chemicals: MeshTreeChemical[];
+}
+
+export interface MeshTreeChemical {
+  chemical_name: string;
+  deseq_id: string;
+  analysis_key: string;
 }
 
 /** 统一 API 响应 */

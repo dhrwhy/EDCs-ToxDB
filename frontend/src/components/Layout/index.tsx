@@ -13,18 +13,9 @@ import {
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SearchBox from "../SearchBox";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const { Header, Content, Footer } = Layout;
-
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-  return isMobile;
-};
 
 const AppLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -97,7 +88,7 @@ const AppLayout: React.FC = () => {
             }}
             onClick={() => navigate("/")}
           >
-            MouseToxDB
+            EDC-ToxDB
           </div>
           <div style={{ flex: 1 }} />
           <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 4 : 12 }}>
@@ -168,7 +159,7 @@ const AppLayout: React.FC = () => {
       <Drawer
         title={
           <span style={{ color: "#1d3e70", fontWeight: "bold", fontSize: 18 }}>
-            MouseToxDB
+            EDC-ToxDB
           </span>
         }
         placement="left"
@@ -223,7 +214,7 @@ const AppLayout: React.FC = () => {
       </Content>
 
       <Footer style={{ textAlign: "center", color: "#666", borderTop: "1px solid #ccc", padding: "12px 0", background: "#f5f5f5", fontSize: isMobile ? 12 : 14 }}>
-        MouseToxDB &copy; 2026 — {t("common.subtitle")}
+        EDC-ToxDB &copy; 2026 — {t("common.subtitle")}
       </Footer>
     </Layout>
   );

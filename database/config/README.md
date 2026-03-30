@@ -1,6 +1,6 @@
 # 配置文件说明
 
-本目录存放 MouseToxDB 数据库的环境配置和 Docker 编排文件。
+本目录存放 EDC-ToxDB 数据库的环境配置和 Docker 编排文件。
 
 ## 文件清单
 

@@ -1,6 +1,6 @@
-# MouseToxDB — 数据库模块
+# EDC-ToxDB — 数据库模块
 
-小鼠毒理转录组数据库（MouseToxDB）的数据库层，负责 MySQL 建库建表、数据导入和资源扫描。
+Endocrine Disrupting Chemicals Toxicogenomics Database（EDC-ToxDB）的数据库层，负责 MySQL 建库建表、数据导入和资源扫描。
 
 ## 目录结构
 
@@ -131,7 +131,7 @@ pip install -r scripts/requirements.txt
 ```bash
 python scripts/import_excel.py
 # 或指定 Excel 路径
-python scripts/import_excel.py --excel /path/to/260307小鼠双端信息全.xlsx
+python scripts/import_excel.py --excel /path/to/260320小鼠双端信息新版本.xlsx
 ```
 
 ### 步骤 6：扫描资源文件
@@ -173,8 +173,8 @@ mysql -u mousetoxdb -pmousetoxdb_pass mousetoxdb < sql/002_verify_data.sql
 | 引擎 | MySQL 8.0 |
 | 数据库名 | mousetoxdb |
 | 字符集 | utf8mb4 / utf8mb4_general_ci |
-| 主表 | `main_records`（986 行，47 列） |
-| 资源表 | `record_assets`（355 条记录） |
+| 主表 | `main_records`（986 行，51 列：4 系统字段 + 47 Excel 源字段） |
+| 资源表 | `record_assets`（642 条记录） |
 
 ### 关键数据指标
 
@@ -223,11 +223,15 @@ DATABASE_URL = "mysql+pymysql://mousetoxdb:mousetoxdb_pass@mysql:3306/mousetoxdb
 | `analysis_key` | VARCHAR(128) | 分析条目标识，格式 `{DESEQ_ID}__{chemical_id}__{GSE_ID}__{BioProject}`，**非 UNIQUE**（同一值对应多行 SRR 样本） |
 | `deseq_id` | VARCHAR(50) | DESeq 分析编号，**非唯一**（有 3 个被复用） |
 | `srr_id` | VARCHAR(50) | SRA Run 编号，每行唯一 |
+| `summary_text` | TEXT | 实验摘要（第二版新增） |
+| `strain` | VARCHAR(255) | 品系/细胞系（第二版新增） |
+| `in_vivo_vitro` | VARCHAR(20) | 体内/体外实验（第二版新增） |
+| `gender` | VARCHAR(20) | 性别（第二版新增） |
 | *(其余 40+ 字段)* | — | 详见 `sql/001_create_tables.sql` 中的完整定义和 COMMENT |
 
 **索引：** `analysis_key`、`chemical_id`、`cas_id`、`inchi_key`、`pubchem_cid`、`deseq_id`（均为普通索引）
 
-#### `record_assets` — 资源表（355 行）
+#### `record_assets` — 资源表（642 行）
 
 每行对应一个 PDF/TXT 资源文件。
 
@@ -263,7 +267,7 @@ class MainRecord(Base):
     __tablename__ = "main_records"
     record_pk = Column(BigInteger, primary_key=True, autoincrement=True)
     analysis_key = Column(String(128), nullable=False, index=True)
-    # ... 其余字段与建表 SQL 一一对应
+    # ... 其余字段与建表 SQL 一一对应（共 47 个 Excel 源字段）
 
 # app/models/record_asset.py
 class RecordAsset(Base):
@@ -281,7 +285,7 @@ class RecordAsset(Base):
 SELECT
     analysis_key, deseq_id, chemical_id, sort_id, cas_id,
     chemical_name, pubchem_cid, pubchem_name, gse_id,
-    bioproject_id, organism, tissue_category, library_method,
+    bioproject_id, organism, tissue_category,
     platform, publication_year,
     COUNT(*) AS sample_count
 FROM main_records
@@ -338,7 +342,10 @@ FROM main_records;
 
 ```sql
 SELECT DISTINCT tissue_category FROM main_records WHERE tissue_category IS NOT NULL ORDER BY tissue_category;
-SELECT DISTINCT library_method FROM main_records WHERE library_method IS NOT NULL ORDER BY library_method;
+SELECT DISTINCT organism FROM main_records WHERE organism IS NOT NULL ORDER BY organism;
+SELECT DISTINCT in_vivo_vitro FROM main_records WHERE in_vivo_vitro IS NOT NULL ORDER BY in_vivo_vitro;
+SELECT DISTINCT strain FROM main_records WHERE strain IS NOT NULL ORDER BY strain;
+SELECT DISTINCT gender FROM main_records WHERE gender IS NOT NULL ORDER BY gender;
 SELECT MIN(publication_year) AS min_year, MAX(publication_year) AS max_year FROM main_records WHERE publication_year IS NOT NULL;
 ```
 

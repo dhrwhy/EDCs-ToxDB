@@ -22,6 +22,10 @@ const DegTable: React.FC<Props> = ({ analysisKey, assets }) => {
   const degAsset = assets.find((a) => a.asset_category === "deg_table");
 
   useEffect(() => {
+    setPage(1);
+  }, [analysisKey]);
+
+  useEffect(() => {
     setLoading(true);
     getDegTable(analysisKey, page, 30)
       .then((res) => {

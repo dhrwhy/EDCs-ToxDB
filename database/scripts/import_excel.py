@@ -45,56 +45,61 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# Excel 列名 → 数据库字段名 映射 (按 Excel 列顺序, 共43列)
+# Excel 列名 → 数据库字段名 映射 (按 Excel 列顺序, 共47列)
 COLUMN_MAPPING = [
-    ("Sort_ID",              "sort_id"),
-    ("ID",                   "chemical_id"),
-    ("CAS_ID",               "cas_id"),
-    ("InChIKey",             "inchi_key"),
-    ("Chemical_Name",        "chemical_name"),
-    ("Alternative_Names",    "alternative_names"),
-    ("PubChem_CID",          "pubchem_cid"),
-    ("PubChem_Name",         "pubchem_name"),
-    ("DESEQ_ID",             "deseq_id"),
-    ("FromGroup",            "from_group"),
-    ("Evidence",             "evidence"),
-    ("GSE_ID",               "gse_id"),
-    ("SRR_ID",               "srr_id"),
-    ("BioProject",           "bioproject_id"),
-    ("AvgSpotLen",           "avg_spot_len"),
-    ("cell_type",            "cell_type"),
-    ("_col17_blank",         "library_layout"),       # 第17列表头为空白
-    ("Organism",             "organism"),
-    ("Platform",             "platform"),
-    ("treatment",            "treatment"),
-    ("Group",                "experiment_group"),
-    ("Chem_Name",            "chem_name"),
-    ("剂量",                 "dose"),
-    ("时间",                 "exposure_time"),
-    ("组织分类",              "tissue_category"),
-    ("组织细分",              "tissue_subcategory"),
-    ("生殖细分",              "reproductive_subcategory"),
-    ("组织/细胞系",           "tissue_or_cell_line"),
-    ("暴露毒物",              "exposure_toxicant"),
-    ("建库方法",              "library_method"),
-    ("详细建库方法",           "library_method_detail"),
-    ("发表年（1900-2030）",   "publication_year"),
-    ("发表月（1-12）",        "publication_month"),
-    ("参考文献",              "reference_title"),
-    ("DOI",                  "doi"),
-    ("Class1",               "class1_code"),
-    ("Class2",               "class2_code"),
-    ("Class3",               "class3_name"),
-    ("Class4",               "class4_name"),
-    ("Class5",               "class5_name"),
-    ("Class6",               "class6_name"),
-    ("Class7",               "class7_name"),
-    ("infer_Class",          "inferred_class"),
+    ("Sort_ID",              "sort_id"),             # Col 1
+    ("ID",                   "chemical_id"),         # Col 2
+    ("CAS_ID",               "cas_id"),              # Col 3
+    ("InChIKey",             "inchi_key"),            # Col 4
+    ("Chemical_Name",        "chemical_name"),        # Col 5
+    ("Alternative_Names",    "alternative_names"),    # Col 6
+    ("PubChem_CID",          "pubchem_cid"),          # Col 7
+    ("PubChem_Name",         "pubchem_name"),         # Col 8
+    ("DESEQ_ID",             "deseq_id"),             # Col 9
+    ("FromGroup",            "from_group"),           # Col 10
+    ("Evidence",             "evidence"),             # Col 11
+    ("GSE_ID",               "gse_id"),               # Col 12
+    ("SRR_ID",               "srr_id"),               # Col 13
+    ("BioProject",           "bioproject_id"),        # Col 14
+    ("AvgSpotLen",           "avg_spot_len"),         # Col 15
+    ("cell_type",            "cell_type"),            # Col 16
+    ("_col17_blank",         "library_layout"),       # Col 17 (表头为空白)
+    ("Organism",             "organism"),             # Col 18
+    ("Platform",             "platform"),             # Col 19
+    ("treatment",            "treatment"),            # Col 20
+    ("Group",                "experiment_group"),     # Col 21
+    ("Chem_Name",            "chem_name"),            # Col 22
+    ("剂量",                 "dose"),                 # Col 23
+    ("时间",                 "exposure_time"),        # Col 24
+    ("Summary",              "summary_text"),         # Col 25 (NEW)
+    ("品系",                 "strain"),               # Col 26 (NEW)
+    ("体内或体外",            "in_vivo_vitro"),        # Col 27 (NEW)
+    ("性别",                 "gender"),               # Col 28 (NEW)
+    ("组织分类",              "tissue_category"),      # Col 29
+    ("组织细分",              "tissue_subcategory"),   # Col 30
+    ("生殖细分",              "reproductive_subcategory"),  # Col 31
+    ("组织/细胞系",           "tissue_or_cell_line"),  # Col 32
+    ("暴露毒物",              "exposure_toxicant"),    # Col 33
+    ("建库方法",              "library_method"),       # Col 34
+    ("详细建库方法",           "library_method_detail"),# Col 35
+    ("发表年（1900-2030）",   "publication_year"),     # Col 36
+    ("发表月（1-12）",        "publication_month"),    # Col 37
+    ("参考文献",              "reference_title"),      # Col 38
+    ("DOI",                  "doi"),                  # Col 39
+    ("Class1",               "class1_code"),          # Col 40
+    ("Class2",               "class2_code"),          # Col 41
+    ("Class3",               "class3_name"),          # Col 42
+    ("Class4",               "class4_name"),          # Col 43
+    ("Class5",               "class5_name"),          # Col 44
+    ("Class6",               "class6_name"),          # Col 45
+    ("Class7",               "class7_name"),          # Col 46
+    ("infer_Class",          "inferred_class"),       # Col 47
 ]
 
 # 裸值 "0" 应视为 NULL 的字段
 ZERO_AS_NULL_FIELDS = {
-    "dose", "tissue_subcategory", "reproductive_subcategory",
+    "dose", "summary_text", "strain", "in_vivo_vitro", "gender",
+    "tissue_subcategory", "reproductive_subcategory",
     "exposure_toxicant", "library_method", "library_method_detail",
     "publication_year", "publication_month", "reference_title", "doi",
     "class3_name", "class4_name", "class5_name",
@@ -170,8 +175,12 @@ def read_excel(excel_path):
 
     records = []
     for row_idx, row_values in enumerate(rows, start=4):
-        if len(row_values) < 43:
-            log.warning(f"第 {row_idx} 行列数不足 43 ({len(row_values)}), 跳过")
+        if len(row_values) < 47:
+            log.warning(f"第 {row_idx} 行列数不足 47 ({len(row_values)}), 跳过")
+            continue
+
+        # 跳过全空行
+        if all(v is None for v in row_values[:47]):
             continue
 
         # 按列顺序映射
@@ -247,6 +256,10 @@ def insert_records(records, db_config):
         conn.commit()
         log.info(f"导入完成: {total_inserted} 行已插入 main_records")
 
+    except Exception:
+        conn.rollback()
+        log.exception("导入失败，已回滚事务")
+        raise
     finally:
         conn.close()
 
@@ -276,7 +289,7 @@ def main():
 
     excel_path = args.excel or os.getenv(
         "EXCEL_PATH",
-        str(Path(__file__).resolve().parent.parent / "data" / "260307小鼠双端信息全.xlsx")
+        str(Path(__file__).resolve().parent.parent / "data" / "260320小鼠双端信息新版本.xlsx")
     )
 
     if not Path(excel_path).exists():

@@ -137,6 +137,13 @@ a:hover {
   border-bottom: none !important;
 }
 
+/* ========== Sticky Collapse Panel Headers (Analysis page only) ========== */
+.analysis-collapse .ant-collapse-item > .ant-collapse-header {
+  position: sticky;
+  top: 117px; /* Header (70px) + Nav bar (~47px) */
+  z-index: 10;
+}
+
 /* ========== Mobile Responsive ========== */
 @media (max-width: 767px) {
   .ant-layout-content {
@@ -177,6 +184,11 @@ a:hover {
   .ant-collapse-header {
     font-size: 14px !important;
     padding: 10px 12px !important;
+  }
+
+  /* Sticky header top for mobile (no nav bar, shorter header) */
+  .analysis-collapse .ant-collapse-item > .ant-collapse-header {
+    top: 56px;
   }
 
   /* Breadcrumb */

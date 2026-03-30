@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.main_record import MainRecord
 from app.models.record_asset import RecordAsset
+from app.config import settings
 
 
 def get_analysis_detail(db: Session, analysis_key: str) -> dict | None:
@@ -44,6 +45,10 @@ def get_analysis_detail(db: Session, analysis_key: str) -> dict | None:
         "publication_month": first.publication_month,
         "reference_title": first.reference_title,
         "doi": first.doi,
+        "summary_text": first.summary_text,
+        "strain": first.strain,
+        "in_vivo_vitro": first.in_vivo_vitro,
+        "gender": first.gender,
         "class1_code": first.class1_code,
         "class2_code": first.class2_code,
         "class3_name": first.class3_name,
@@ -79,14 +84,16 @@ def get_analysis_detail(db: Session, analysis_key: str) -> dict | None:
         .all()
     )
 
+    prefix = settings.URL_PREFIX
+
     assets = []
     for a in asset_rows:
         # PDF 资源优先使用 PNG 预览图
         if a.file_ext == "pdf":
             png_path = a.file_path.rsplit(".", 1)[0] + ".png"
-            preview_url = f"/static/assets/{png_path}"
+            preview_url = f"{prefix}/static/assets/{png_path}"
         else:
-            preview_url = f"/static/assets/{a.file_path}"
+            preview_url = f"{prefix}/static/assets/{a.file_path}"
 
         assets.append({
             "asset_id": a.asset_id,
@@ -95,7 +102,7 @@ def get_analysis_detail(db: Session, analysis_key: str) -> dict | None:
             "asset_category": a.asset_category,
             "file_ext": a.file_ext,
             "preview_url": preview_url,
-            "download_url": f"/api/assets/{a.asset_id}/download",
+            "download_url": f"{prefix}/api/assets/{a.asset_id}/download",
             "status": a.status,
         })
 
@@ -120,6 +127,7 @@ def get_assets_by_analysis_key(db: Session, analysis_key: str) -> list | None:
         return None
 
     deseq_id = record.deseq_id
+    prefix = settings.URL_PREFIX
     asset_rows = (
         db.query(RecordAsset)
         .filter(RecordAsset.deseq_id == deseq_id)
@@ -132,9 +140,9 @@ def get_assets_by_analysis_key(db: Session, analysis_key: str) -> list | None:
     for a in asset_rows:
         if a.file_ext == "pdf":
             png_path = a.file_path.rsplit(".", 1)[0] + ".png"
-            preview_url = f"/static/assets/{png_path}"
+            preview_url = f"{prefix}/static/assets/{png_path}"
         else:
-            preview_url = f"/static/assets/{a.file_path}"
+            preview_url = f"{prefix}/static/assets/{a.file_path}"
 
         assets.append({
             "asset_id": a.asset_id,
@@ -143,7 +151,7 @@ def get_assets_by_analysis_key(db: Session, analysis_key: str) -> list | None:
             "asset_category": a.asset_category,
             "file_ext": a.file_ext,
             "preview_url": preview_url,
-            "download_url": f"/api/assets/{a.asset_id}/download",
+            "download_url": f"{prefix}/api/assets/{a.asset_id}/download",
             "status": a.status,
         })
 

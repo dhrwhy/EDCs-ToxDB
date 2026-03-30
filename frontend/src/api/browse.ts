@@ -8,9 +8,14 @@ import type {
 
 export async function browseAnalyses(params: {
   tissue_category?: string;
-  library_method?: string;
   year_min?: number;
   year_max?: number;
+  organism?: string;
+  in_vivo_vitro?: string;
+  strain?: string;
+  gender?: string;
+  sort_by?: string;
+  sort_order?: string;
   page?: number;
   page_size?: number;
 }) {

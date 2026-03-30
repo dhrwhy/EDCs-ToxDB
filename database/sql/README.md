@@ -1,6 +1,6 @@
 # SQL 脚本说明
 
-本目录存放 MouseToxDB 的数据库建表与验证脚本。
+本目录存放 EDC-ToxDB 的数据库建表与验证脚本。
 
 ## 文件清单
 
@@ -11,7 +11,7 @@
 **`main_records`（主表）**
 - 存储 Excel 中 986 行样本记录
 - 系统字段 4 个：`record_pk`（主键）、`analysis_key`、`created_at`、`updated_at`
-- Excel 源字段 43 个：从 `sort_id` 到 `inferred_class`
+- Excel 源字段 47 个：从 `sort_id` 到 `inferred_class`，含第二版新增字段 `summary_text`、`strain`、`in_vivo_vitro`、`gender`
 - 索引 6 个：`analysis_key`、`chemical_id`、`cas_id`、`inchi_key`、`pubchem_cid`、`deseq_id`
 
 **`record_assets`（资源表）**

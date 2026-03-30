@@ -225,6 +225,10 @@ def insert_assets(records, db_config):
 
         log.info(f"插入完成: {len(values)} 条资源记录已写入 record_assets")
 
+    except Exception:
+        conn.rollback()
+        log.exception("插入失败，已回滚事务")
+        raise
     finally:
         conn.close()
 

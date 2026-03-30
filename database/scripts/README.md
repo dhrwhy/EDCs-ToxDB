@@ -1,6 +1,6 @@
 # Python 脚本说明
 
-本目录存放 MouseToxDB 的数据导入和资源扫描脚本。
+本目录存放 EDC-ToxDB 的数据导入和资源扫描脚本。
 
 ## 环境准备
 
@@ -17,11 +17,11 @@ pip install -r requirements.txt
 
 ### import_excel.py — Excel 数据导入脚本
 
-将 `260307小鼠双端信息全.xlsx` 中的 986 行样本数据导入 `main_records` 表。
+将 `260320小鼠双端信息新版本.xlsx` 中的 989 行数据（导入后 986 条记录）导入 `main_records` 表。
 
 **执行流程：**
 1. 读取 Excel（Sheet1，第 3 行表头，第 4 行起数据）
-2. 列名映射：Excel 的 43 列 → 数据库字段名（snake_case）
+2. 列名映射：Excel 的 47 列 → 数据库字段名（snake_case），含新增字段 `summary_text`、`strain`、`in_vivo_vitro`、`gender`
 3. 数据清洗：
    - 去除首尾空格和 `\xa0` 等不可见字符
    - 空字符串 → NULL
@@ -44,7 +44,7 @@ python import_excel.py --host localhost --port 3306 --user mousetoxdb --password
 
 **预期输出：**
 ```
-[INFO] 已读取 986 行数据
+[INFO] 已读取 989 行数据
 [INFO] 清洗完成, 生成 986 条记录
 [INFO] 唯一 analysis_key 数: 81
 [INFO] 导入完成: 986 行已插入 main_records
@@ -87,8 +87,8 @@ python scan_assets.py --assets-dir /path/to/demo
 **预期输出：**
 ```
 [INFO] 找到 35 个 DESEQ 目录
-[INFO] 扫描完成: 355 条资源记录
-[INFO]   available: 353
+[INFO] 扫描完成: 642 条资源记录
+[INFO]   available: 640
 [INFO]   pending: 2
 ```
 
