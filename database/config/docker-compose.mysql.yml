@@ -7,7 +7,7 @@
 # 用法:
 #   cp .env.example .env
 #   docker compose -f docker-compose.mysql.yml up -d
-#   docker compose -f docker-compose.mysql.yml exec mysql mysql -u mousetoxdb -pmousetoxdb_pass mousetoxdb
+#   docker compose -f docker-compose.mysql.yml exec mysql mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE
 # ============================================================
 
 version: "3.8"

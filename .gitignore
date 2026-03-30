@@ -26,3 +26,13 @@ Thumbs.db
 
 # Claude Code
 .claude/
+
+# Research data (sensitive)
+database/data/
+demo/
+
+# Internal docs
+Project/
+
+# Test screenshots
+backend/test_screenshots/
